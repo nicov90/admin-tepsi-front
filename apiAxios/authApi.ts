@@ -11,7 +11,7 @@ const baseURLs = {
 const currentEnv = 'production';
 export const baseURL = baseURLs[currentEnv];
 
-const moduloActual = "-"; // para los roles de la aplicación en cuestión
+const moduloActual = "-";
 const nombreCarpetaAzure = ""; // para los archivos subidos en azure
 
 export const authApi = (token?: string, ignoreToken = false) => {

@@ -13,8 +13,9 @@ export interface IUsuario {
 export interface IUsuarioUpdate {
   nombre?: string;
   email?: string;
-  password?: string;
+  password?: string | null;
   roles?: string[];
+  cargadoPor?: string;
 }
   
 export type IUsuarioSinPassword = Omit<IUsuario, 'password' | 'id'>;

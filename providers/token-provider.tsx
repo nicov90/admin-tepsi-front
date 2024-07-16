@@ -13,6 +13,7 @@ export default function TokenProvider({ children, ...rest }: Props) {
 
   useEffect(() => {
     if(session){
+      console.log(session)
       //@ts-ignore
       const token = session?.user?.token;
       Cookies.set("token", token);

@@ -4,7 +4,7 @@ import { Button } from '../ui/button'
 import { DialogContent, DialogTitle } from '../ui/dialog'
 import { startCase } from 'lodash'
 import { useSession } from 'next-auth/react'
-import { IUsuarioNuevo } from '@/interfaces/usuarios'
+import { IUsuarioNuevo, IUsuarioUpdate } from '@/interfaces/usuarios'
 import { UsuariosRolesContext } from '@/providers/usuariosRoles-provider'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
@@ -20,6 +20,8 @@ import { NuevaCuentaFormSchema } from '@/utils/validations'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { getRolesByUsuarioId } from '@/database/dbRoles'
 import { Rol } from '@/interfaces/roles'
+
+const templatePassword = 'AAAAAAAAAAAAA';
 
 const UsuarioDetalles = () => {
   const { data: session }: any = useSession();
@@ -38,13 +40,14 @@ const UsuarioDetalles = () => {
     },
   })
   const [mostrarInputPassword, setMostrarInputPassword] = useState(false);
+  const [permitirCambiarContraseña, setPermitirCambiarContraseña] = useState(false);
 
   async function onSubmit(values: z.infer<typeof NuevaCuentaFormSchema>) {
-    const formattedValues: IUsuarioNuevo = {
+    const formattedValues: IUsuarioUpdate = {
       ...values,
       nombre: startCase(values.nombre.trim()),
       email: values.email.trim(),
-      password: (values.password?.includes('*') ? usuario?.password : values.password?.trim()) || '',
+      password: values.password === templatePassword ? null : values.password?.trim() || null,
       roles: values.roles,
       cargadoPor: session.user?.id || '',
     }
@@ -69,13 +72,14 @@ const UsuarioDetalles = () => {
           nombre: usuario?.nombre,
           email: usuario?.email,
           roles: [],
-          password: usuario?.password ? '***********' : '',
+          password: usuario?.password ? templatePassword : '',
         });
         const roles: Rol[] = await getRolesByUsuarioId(usuario.id).then((res) => res);
         form.setValue('roles', roles.map(r => r.Id));
       })()
     }
-  }, [usuario]);
+    setPermitirCambiarContraseña(false);
+  }, [usuario, idUsuarioUrl]);
 
   return (
     <>
@@ -156,7 +160,17 @@ const UsuarioDetalles = () => {
 
                       </FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="********" {...field} />
+                        <Input 
+                          type="password" 
+                          placeholder="********" 
+                          {...field}
+                          onChange={(e) => {
+                            setPermitirCambiarContraseña(true);
+                            field.onChange(e);
+                          }}
+                          onSelect={() => (usuario.password && !permitirCambiarContraseña) && form.setValue('password', '')} 
+                          onBlur={() => (usuario.password && !permitirCambiarContraseña) && form.setValue('password', templatePassword)}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -186,7 +200,6 @@ const UsuarioDetalles = () => {
                             const r = listaRoles.todos.find(
                               (rol) => rol.Id === rolSeleccionado
                             );
-                            console.log(field.value)
                   
                             return {
                               value: r?.Id || '',

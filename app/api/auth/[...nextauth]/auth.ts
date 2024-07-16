@@ -6,6 +6,7 @@ import { capitalize } from 'lodash';
 import { IUsuario } from '@/interfaces/usuarios';
 import { getUsuarioByEmail, registerUsuario } from '@/database/dbUsuarios';
 import { authApi } from "@/apiAxios/authApi";
+import { NextResponse } from "next/server";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -15,8 +16,12 @@ export const authOptions: AuthOptions = {
         email: { label: 'Correo:', type: 'email', placeholder: 'tu@correo.com'  },
         password: { label: 'Contraseña:', type: 'password', placeholder: 'Contraseña'  },
       },
-      async authorize(credentials):Promise<any> {
+      async authorize(credentials, req):Promise<any> {
         try {
+          const url = new URL(req.headers?.referer);
+          const searchParams = url.searchParams;
+          const callbackUrl = searchParams.get('callbackUrl');
+
           if(!credentials?.email || !credentials?.password){
             return null;
           }
@@ -40,7 +45,8 @@ export const authOptions: AuthOptions = {
 
           const userWithToken = {
             ...user,
-            token
+            token,
+            callbackUrl
           }
 
           // res.setHeader('Set-Cookie', `token=${token};path=/`)
@@ -77,9 +83,13 @@ export const authOptions: AuthOptions = {
       }
       return token;
     },
-    async session({ session, token }){  // reemplaza los valores del token en la sesion
+    async session({ session, token }: any){  // reemplaza los valores del token en la sesion
       session.accessToken = token.accessToken as string;
-      session.user = token.user as any || token;
+      const { callbackUrl, ...tokenUser } = token.user;
+      token.user = tokenUser as any;
+      token.callbackUrl = callbackUrl as string;
+      session.user = tokenUser as any || token;
+      session.callbackUrl = callbackUrl as string;
 
       // @ts-ignore
       if(session.user && !session?.user?.roles){
@@ -109,9 +119,36 @@ export const authOptions: AuthOptions = {
       //   session.user.token = newToken;
       //   res.setHeader('Set-Cookie', `token=${newToken};path=/`)
       // }
+
+       // Redirigir al callbackUrl después del inicio de sesión
+      //  if (session.user && session.callbackUrl) {
+      //   const redirectUrl = new URL(session.callbackUrl, process.env.NEXT_PUBLIC_APP_URL);
+      //   return NextResponse.redirect(redirectUrl.toString());
+      // }
       
       return session;
-    }
+    },
+    // async redirect({ url, baseUrl }) {
+    //   console.log(url, baseUrl);
+      
+    //   // Si la URL es relativa, prepende baseUrl
+    //   if(url.startsWith("/")){
+    //     console.log(`${baseUrl}${url}`)
+    //     return `${baseUrl}${url}`;
+    //   }
+
+    //   // if (new URL(url).origin === new URL(baseUrl).origin) {
+    //   //   console.log(url)
+    //   //   return url;
+    //   // }
+    //   const fullUrl = new URL(url);
+    //   const callbackUrl = fullUrl.searchParams.get('callbackUrl');
+    //   console.log("callbackUrl",callbackUrl)
+
+    //   if(callbackUrl) return callbackUrl;
+    //   console.log("url", url)
+    //   return url;
+    // },
   },
 
   // Custom Pages
@@ -124,6 +161,7 @@ export const authOptions: AuthOptions = {
     strategy: 'jwt',
     updateAge: 86400, // cada día
   },
+
   events: {
     async signIn({ user, account, profile }) {
       const userName = (user?.name || profile?.name)?.split(" ").map((word) => capitalize(word.toLowerCase())).join(" ")!;
@@ -131,7 +169,7 @@ export const authOptions: AuthOptions = {
 
       if(account?.provider === 'azure-ad' && userEmail){
         try{
-          const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
+          const newToken = (await authApi(undefined, true).post(`/Auth/ValidarTokenAzure`, {
             azureToken: account?.access_token,
           })).data.token;
           
@@ -150,4 +188,66 @@ export const authOptions: AuthOptions = {
       }
     }
   },
+  // cookies: {
+  //   sessionToken: {
+  //     name: `__Secure-next-auth.session-token`,
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: 'lax',
+  //       path: '/',
+  //       secure: true,
+  //       domain: '.grupotepsi.com'
+  //     }
+  //   },
+  //   callbackUrl: {
+  //     name: `__Secure-next-auth.callback-url`,
+  //     options: {
+  //       sameSite: 'lax',
+  //       path: '/',
+  //       secure: true,
+  //       domain: '.grupotepsi.com'
+  //     }
+  //   },
+  //   csrfToken: {
+  //     name: `__Host-next-auth.csrf-token`,
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: 'lax',
+  //       path: '/',
+  //       secure: true,
+  //       domain: '.grupotepsi.com'
+  //     }
+  //   },
+  // }
+  cookies: {
+    sessionToken: {
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : `next-auth.session-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'none',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
+      }
+    },
+    callbackUrl: {
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.callback-url' : `next-auth.callback-url`,
+      options: {
+        sameSite: 'none',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
+      }
+    },
+    csrfToken: {
+      name: process.env.NODE_ENV === 'production' ? '__Host-next-auth.csrf-token' : `next-auth.csrf-token`,
+      options: {
+        httpOnly: true,
+        sameSite: 'none',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
+      }
+    },
+  }
 }

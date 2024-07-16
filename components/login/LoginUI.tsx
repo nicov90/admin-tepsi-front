@@ -43,6 +43,7 @@ const LoginUI = ({enableCustomLogin}: {enableCustomLogin: boolean}) => {
     }); // manda los datos al authorize
 
     if (loginStatus?.ok) {
+      console.log(callbackUrl)
       router.push(callbackUrl ? callbackUrl : "/inicio");
     } else {
       setIsLoading(false);
@@ -71,7 +72,7 @@ const LoginUI = ({enableCustomLogin}: {enableCustomLogin: boolean}) => {
   //* por alguna razón el inicio de sesión con azure no redirecciona correctamente asi que uso esto
   useEffect(() => {
     if (status === "authenticated") {
-      router.push("/inicio");
+      router.push(callbackUrl ? callbackUrl : "/inicio");
     }
   }, [status]);
 
