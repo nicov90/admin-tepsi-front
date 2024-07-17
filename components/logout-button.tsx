@@ -1,10 +1,12 @@
 'use client';
 
-import { signOut, signIn } from "next-auth/react";
+import { signOut, signIn, useSession } from "next-auth/react";
 import { LogIn, LogOut, PlusCircle } from "lucide-react";
 import Image from "next/image";
+import { SessionWithUser } from "@/interfaces/session";
 
-export const LogoutButton = () => {    
+export const LogoutButton = () => {
+    const { status } = useSession() as SessionWithUser;
     const avatarUrl = 'https://tailus.io/sources/blocks/grid-cards/preview/images/avatars/third_user.webp';
    
 
