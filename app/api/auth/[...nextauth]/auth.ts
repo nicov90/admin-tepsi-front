@@ -219,35 +219,36 @@ export const authOptions: AuthOptions = {
   //     }
   //   },
   // }
-  cookies: {
-    sessionToken: {
-      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : `next-auth.session-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'none',
-        path: '/',
-        secure: true,
-        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
-      }
-    },
-    callbackUrl: {
-      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.callback-url' : `next-auth.callback-url`,
-      options: {
-        sameSite: 'none',
-        path: '/',
-        secure: true,
-        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
-      }
-    },
-    csrfToken: {
-      name: process.env.NODE_ENV === 'production' ? '__Host-next-auth.csrf-token' : `next-auth.csrf-token`,
-      options: {
-        httpOnly: true,
-        sameSite: 'none',
-        path: '/',
-        secure: true,
-        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
-      }
-    },
-  }
+
+  // cookies: {
+  //   sessionToken: {
+  //     name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : `next-auth.session-token`,
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: 'none',
+  //       path: '/',
+  //       secure: true,
+  //       domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
+  //     }
+  //   },
+  //   callbackUrl: {
+  //     name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.callback-url' : `next-auth.callback-url`,
+  //     options: {
+  //       sameSite: 'none',
+  //       path: '/',
+  //       secure: true,
+  //       domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
+  //     }
+  //   },
+  //   csrfToken: {
+  //     name: process.env.NODE_ENV === 'production' ? '__Host-next-auth.csrf-token' : `next-auth.csrf-token`,
+  //     options: {
+  //       httpOnly: true,
+  //       sameSite: 'none',
+  //       path: '/',
+  //       secure: true,
+  //       domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
+  //     }
+  //   },
+  // }
 }
