@@ -25,7 +25,7 @@ export const authApi = (token?: string, ignoreToken = false) => {
   });
 
   // if (currentEnv === 'development') {
-    axiosInstance.defaults.httpsAgent = new https.Agent({ rejectUnauthorized: false });
+    // axiosInstance.defaults.httpsAgent = new https.Agent({ rejectUnauthorized: false });
   // }
 
   if(!ignoreToken){
