@@ -228,7 +228,7 @@ export const authOptions: AuthOptions = {
         sameSite: 'none',
         path: '/',
         secure: true,
-        domain: process.env.NODE_ENV === 'production' ? 'grupotepsi.com' : 'localhost'
+        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
       }
     },
     callbackUrl: {
@@ -237,7 +237,7 @@ export const authOptions: AuthOptions = {
         sameSite: 'none',
         path: '/',
         secure: true,
-        domain: process.env.NODE_ENV === 'production' ? 'grupotepsi.com' : 'localhost'
+        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
       }
     },
     csrfToken: {
@@ -247,8 +247,38 @@ export const authOptions: AuthOptions = {
         sameSite: 'none',
         path: '/',
         secure: true,
-        domain: process.env.NODE_ENV === 'production' ? 'grupotepsi.com' : 'localhost'
+        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
       }
+    },
+    nonce: {
+      name: process.env.NODE_ENV === 'production' ? '__Host-next-auth.nonce' : `next-auth.nonce`,
+      options: {
+        httpOnly: true,
+        sameSite: 'none',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
+      },
+    },
+    state: {
+      name: process.env.NODE_ENV === 'production' ? '__Host-next-auth.state' : `next-auth.state`,
+      options: {
+        httpOnly: true,
+        sameSite: 'none',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
+      },
+    },
+    pkceCodeVerifier: {
+      name: process.env.NODE_ENV === 'production' ? '__Host-next-auth.pkce.code_verifier' : `next-auth.pkce.code_verifier`,
+      options: {
+        httpOnly: true,
+        sameSite: 'none',
+        path: '/',
+        secure: true,
+        domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
+      },
     },
   }
 }

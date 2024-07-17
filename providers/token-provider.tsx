@@ -15,7 +15,7 @@ export default function TokenProvider({ children, ...rest }: Props) {
   useEffect(() => {
     if(session){
       const token = session?.user?.token;
-      Cookies.set("token", token);
+      Cookies.set("token", token, { domain: ".grupotepsi.com" });
     }else{
       Cookies.remove("token");
     }
