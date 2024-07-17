@@ -241,7 +241,7 @@ export const authOptions: AuthOptions = {
       }
     },
     csrfToken: {
-      name: process.env.NODE_ENV === 'production' ? '__Host-next-auth.csrf-token' : `next-auth.csrf-token`,
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.csrf-token' : `next-auth.csrf-token`,
       options: {
         httpOnly: true,
         sameSite: 'none',
@@ -251,7 +251,7 @@ export const authOptions: AuthOptions = {
       }
     },
     nonce: {
-      name: process.env.NODE_ENV === 'production' ? '__Host-next-auth.nonce' : `next-auth.nonce`,
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.nonce' : `next-auth.nonce`,
       options: {
         httpOnly: true,
         sameSite: 'none',
@@ -261,7 +261,7 @@ export const authOptions: AuthOptions = {
       },
     },
     state: {
-      name: process.env.NODE_ENV === 'production' ? '__Host-next-auth.state' : `next-auth.state`,
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.state' : `next-auth.state`,
       options: {
         httpOnly: true,
         sameSite: 'none',
@@ -271,7 +271,7 @@ export const authOptions: AuthOptions = {
       },
     },
     pkceCodeVerifier: {
-      name: process.env.NODE_ENV === 'production' ? '__Host-next-auth.pkce.code_verifier' : `next-auth.pkce.code_verifier`,
+      name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.pkce.code_verifier' : `next-auth.pkce.code_verifier`,
       options: {
         httpOnly: true,
         sameSite: 'none',
