@@ -3,18 +3,17 @@
 import { useSession } from "next-auth/react";
 import { useEffect } from "react";
 import Cookies from 'js-cookie';
+import { SessionWithUser } from "@/interfaces/session";
 
 interface Props {
   children: React.ReactNode;
 }
 
 export default function TokenProvider({ children, ...rest }: Props) {
-  const { data: session } = useSession();
+  const { data: session } = useSession() as SessionWithUser;
 
   useEffect(() => {
     if(session){
-      console.log(session)
-      //@ts-ignore
       const token = session?.user?.token;
       Cookies.set("token", token);
     }else{

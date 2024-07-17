@@ -1,11 +1,11 @@
+import { RolesListaNombres } from "./roles";
+
 export interface IUsuario {
     id: string;
     nombre: string;
     email: string;
     password: string;
-    rolGeneral: string;
-    rolesModulo: string[];
-    roles: string[];
+    roles: RolesListaNombres[];
     cargadoPor: string;
     existePersonal: boolean;
   }
@@ -20,6 +20,7 @@ export interface IUsuarioUpdate {
   
 export type IUsuarioSinPassword = Omit<IUsuario, 'password' | 'id'>;
 
-export interface IUsuarioNuevo extends Omit<IUsuario, 'id' | 'rolGeneral' | 'rolesModulo' | 'existePersonal'> {
+export interface IUsuarioNuevo extends Omit<IUsuario, 'id' | 'existePersonal' | 'roles'> {
   tipoLogin?: 'microsoft' | 'custom';
+  roles: string[];
 }

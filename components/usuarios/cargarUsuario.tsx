@@ -17,9 +17,10 @@ import { CircleHelpIcon, Info, PlusSquareIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import MultipleSelector from '../ui/select-multiple'
 import { NuevaCuentaFormSchema } from '@/utils/validations'
+import { SessionWithUser } from '@/interfaces/session'
 
 const CargarUsuario = () => {
-  const { data: session }: any = useSession();
+  const { data: session }: any = useSession() as SessionWithUser;
   const { refreshUsuarios, listaRoles } = useContext(UsuariosRolesContext);
 
   const [openModal, setOpenModal] = useState(false);
@@ -195,7 +196,7 @@ const CargarUsuario = () => {
                       <FormControl>
                         <MultipleSelector
                           // value={form.getValues().roles.map((rolSeleccionado) => {
-                          //   const r = listaRoles.todos.find(
+                          //   const r = listaRoles.find(
                           //     (rol) => rol.Id === rolSeleccionado
                           //   );
                             
@@ -205,7 +206,7 @@ const CargarUsuario = () => {
                           //   };
                           // })}
                           value={field.value.map((rolSeleccionado) => {
-                            const r = listaRoles.todos.find(
+                            const r = listaRoles.find(
                               (rol) => rol.Id === rolSeleccionado
                             );
                   
@@ -218,7 +219,7 @@ const CargarUsuario = () => {
                           onChange={(selectedOptions) => {
                             field.onChange(selectedOptions.map(option => option.value));
                           }}
-                          options={listaRoles.todos.map((rol) => ({
+                          options={listaRoles.map((rol) => ({
                             value: rol.Id,
                             label: rol.Name,
                             group: rol.Modulo || 'Otros'

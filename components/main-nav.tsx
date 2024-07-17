@@ -2,16 +2,13 @@
 
 import { useWindowSize } from "@/hooks/useWindowSize";
 import { cn } from "@/lib/utils";
-import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
-import { useContext, useEffect } from "react";
 
 export function MainNav({
     className,
     ...props
 }: React.HTMLAttributes<HTMLElement>) {
-    const { data: session } = useSession();
     const pathname = usePathname();
     const params = useParams();
     const { width } = useWindowSize();

@@ -1,16 +1,11 @@
 'use client';
 
-import { useSession, signOut, signIn } from "next-auth/react";
-import { LogIn, LogOut, PlusCircle, Store as StoreIcon } from "lucide-react";
+import { signOut, signIn } from "next-auth/react";
+import { LogIn, LogOut, PlusCircle } from "lucide-react";
 import Image from "next/image";
 
-export const LogoutButton = () => {
-
-    const { data: session, status } = useSession();
-    
-    const avatarUrl = ( session?.user?.image )
-    ? session.user.image
-    : 'https://tailus.io/sources/blocks/grid-cards/preview/images/avatars/third_user.webp';
+export const LogoutButton = () => {    
+    const avatarUrl = 'https://tailus.io/sources/blocks/grid-cards/preview/images/avatars/third_user.webp';
    
 
     if ( status === 'loading' ) {

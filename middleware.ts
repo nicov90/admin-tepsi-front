@@ -2,9 +2,11 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt';
 import { getCookie, getCookies, setCookie } from 'cookies-next';
+import { JWTWithUser } from './interfaces/session';
+import { RolesListaNombres } from './interfaces/roles';
 
 export async function middleware(req: NextRequest) {
-    const session:any = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
+    const session: JWTWithUser | null = await getToken({ req, secret: process.env.NEXTAUTH_SECRET });
     const pathname = req.nextUrl.pathname;
 
     // const callBackUrl = getCookie('next-auth.callback-url');
@@ -33,20 +35,23 @@ export async function middleware(req: NextRequest) {
     
             return NextResponse.redirect(url);
         }
+    }else{
+
+        if(pathname.startsWith('/inicio') || pathname.startsWith('/roles')){
+            const validRoles: RolesListaNombres[] = [ 'Admin - GENERAL' ];
+            const userRoles = (session?.user?.roles  || session?.roles || []) as RolesListaNombres[];
+            const hasValidRole = userRoles.some((role) => validRoles.includes(role));
+        
+            if ( !hasValidRole ) {
+                const url = req.nextUrl.clone();
+                url.pathname = `/denied`;
+                url.search = '';
+                return NextResponse.redirect(url);
+            }
+        }
+
     }
 
-    if(pathname.startsWith('/inicio') || pathname.startsWith('/roles')){
-        const validRoles = [ 'Admin - GENERAL' ];
-        const userRoles: string[] = session?.user?.roles  || session?.roles || [];
-        const hasValidRole = userRoles.some((role: string) => validRoles.includes(role));
-    
-        if ( !hasValidRole ) {
-            const url = req.nextUrl.clone();
-            url.pathname = `/denied`;
-            url.search = '';
-            return NextResponse.redirect(url);
-        }
-    }
     return NextResponse.next();
 }
 

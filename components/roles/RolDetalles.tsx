@@ -13,7 +13,7 @@ const RolDetalles = () => {
   const pathname = usePathname();
   const { refreshRoles, listaRoles } = useContext(UsuariosRolesContext);
   const idRolUrl = useSearchParams().get("id");
-  const rol = listaRoles && listaRoles.todos.find(u => u.Id === idRolUrl) || null;
+  const rol = listaRoles && listaRoles.find(u => u.Id === idRolUrl) || null;
   const [rolDescripcion, setRolDescripcion] = useState('');
 
   async function saveChanges() {

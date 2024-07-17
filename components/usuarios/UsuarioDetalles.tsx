@@ -20,11 +20,12 @@ import { NuevaCuentaFormSchema } from '@/utils/validations'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { getRolesByUsuarioId } from '@/database/dbRoles'
 import { Rol } from '@/interfaces/roles'
+import { SessionWithUser } from '@/interfaces/session'
 
 const templatePassword = 'AAAAAAAAAAAAA';
 
 const UsuarioDetalles = () => {
-  const { data: session }: any = useSession();
+  const { data: session } = useSession() as SessionWithUser;
   const { push } = useRouter();
   const pathname = usePathname();
   const { listaUsuarios, refreshUsuarios, listaRoles } = useContext(UsuariosRolesContext);
@@ -49,7 +50,7 @@ const UsuarioDetalles = () => {
       email: values.email.trim(),
       password: values.password === templatePassword ? null : values.password?.trim() || null,
       roles: values.roles,
-      cargadoPor: session.user?.id || '',
+      cargadoPor: session!.user?.id || '',
     }
     
     try{
@@ -197,7 +198,7 @@ const UsuarioDetalles = () => {
                           //   };
                           // })}
                           value={field.value.map((rolSeleccionado) => {
-                            const r = listaRoles.todos.find(
+                            const r = listaRoles.find(
                               (rol) => rol.Id === rolSeleccionado
                             );
                   
@@ -210,7 +211,7 @@ const UsuarioDetalles = () => {
                           onChange={(selectedOptions) => {
                             field.onChange(selectedOptions.map(option => option.value));
                           }}
-                          options={listaRoles.todos.map((rol) => ({
+                          options={listaRoles.map((rol) => ({
                             value: rol.Id,
                             label: rol.Name,
                             group: rol.Modulo || 'Otros'

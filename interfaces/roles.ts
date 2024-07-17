@@ -1,11 +1,6 @@
-export interface Roles {
-  general: Rol[];
-  modulo: Rol[];
-  todos: Rol[];
-}
-
 export interface Rol {
   Id: string;
+  FullName: RolesListaNombres;
   Name: string;
   Modulo: string;
   Descripcion: string;
@@ -17,4 +12,7 @@ export interface RolUpdate{
   Descripcion?: string;
 }
 
-export type RolNuevo = Omit<Rol, 'Id'>
+export type RolNuevo = Omit<Rol, 'Id' | 'FullName'>
+
+export type RolesListaNombres = 
+'Admin - GENERAL' | 'Admin - NOVEDADES' | 'Supervisor - NOVEDADES' | 'Finanzas - RENDICIONES' | 'Supervisor - RENDICIONES'

@@ -1,11 +1,9 @@
 'use client'
 import React, { useContext, useState } from 'react'
 import { Button } from '../ui/button'
-import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from '../ui/dialog'
+import { Dialog, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from '../ui/dialog'
 import { Label } from '../ui/label'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 import { startCase } from 'lodash'
-import { useSession } from 'next-auth/react'
 import { Rol, RolNuevo } from '@/interfaces/roles'
 import MultipleSelector from '../ui/select-multiple'
 import { UsuariosRolesContext } from '@/providers/usuariosRoles-provider'
@@ -15,9 +13,8 @@ import { insertRole } from '@/database/dbRoles'
 import { Textarea } from '../ui/textarea'
 
 const CargarRol = () => {
-  const { data: session }: any = useSession();
   const { refreshRoles, listaRoles } = useContext(UsuariosRolesContext);
-  const listaModulos = listaRoles ? [...new Set([...listaRoles.todos.map((rol: Rol) => rol.Modulo)])] : [];
+  const listaModulos = listaRoles ? [...new Set([...listaRoles.map((rol: Rol) => rol.Modulo)])] : [];
 
   const [openModal, setOpenModal] = useState(false);
   const [nuevoRol, setNuevoRol] = useState<RolNuevo>({

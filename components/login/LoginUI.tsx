@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
+import { SessionWithUser } from '@/interfaces/session';
 
 type FormData = {
   email: string;
@@ -18,7 +19,7 @@ type FormData = {
 };
 
 const LoginUI = ({enableCustomLogin}: {enableCustomLogin: boolean}) => {
-  const { status } = useSession();
+  const { status } = useSession() as SessionWithUser;
   const callbackUrl = useSearchParams().get('callbackUrl');
 
   const router = useRouter();
@@ -43,7 +44,6 @@ const LoginUI = ({enableCustomLogin}: {enableCustomLogin: boolean}) => {
     }); // manda los datos al authorize
 
     if (loginStatus?.ok) {
-      console.log(callbackUrl)
       router.push(callbackUrl ? callbackUrl : "/inicio");
     } else {
       setIsLoading(false);

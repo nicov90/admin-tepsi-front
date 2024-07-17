@@ -13,6 +13,7 @@ import { deleteUsuario } from '@/database/dbUsuarios'
 import { UsuariosRolesContext } from '@/providers/usuariosRoles-provider'
 import UsuarioDetalles from '../usuarios/UsuarioDetalles'
 import RolDetalles from '../roles/RolDetalles'
+import { SessionWithUser } from '@/interfaces/session'
 
 interface Props{
   row: any
@@ -21,7 +22,7 @@ interface Props{
 
 const TableItemDropdown = ({ row, nombreTabla }: Props) => {
   const { push } = useRouter();
-  const { data: session }: any = useSession();
+  const { data: session } = useSession() as SessionWithUser;
   const { refreshUsuarios } = useContext(UsuariosRolesContext);
   const { refreshRoles } = useContext(UsuariosRolesContext);
   const searchParams = useSearchParams();
@@ -52,7 +53,7 @@ const TableItemDropdown = ({ row, nombreTabla }: Props) => {
 
       case 'roles':
 
-        if(rowData.Modulo === 'GENERAL' && rowData.Name === 'Admin'){
+        if(rowData.Modulo == 'GENERAL' && rowData.Name == 'Admin'){
           toast.error('Este rol no se puede eliminar.', { style: { backgroundColor: "red", color: "white" } });
           return;
         }

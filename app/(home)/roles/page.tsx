@@ -15,7 +15,7 @@ const Roles = () => {
       {listaRoles ? (
         <DataTable 
           columns={RolesColumns} 
-          data={listaRoles.todos}
+          data={listaRoles}
           filterByColumn='Name'
           searchPlaceholder='Buscar por rol...'
         >

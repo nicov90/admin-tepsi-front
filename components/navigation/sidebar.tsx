@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
 import { usePathname } from "next/navigation";
-import { useSession } from "next-auth/react";
 
 interface SidebarProps {
   storageKey?: string;
@@ -12,7 +11,6 @@ interface SidebarProps {
 export const Sidebar = ({
   storageKey = "t-sidebar-state",
 }: SidebarProps) => {
-  const { data: session } = useSession();
   const pathname = usePathname();
 
   const routes = [

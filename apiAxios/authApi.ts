@@ -5,7 +5,7 @@ import https from 'https';
 const baseURLs = {
   development: 'https://localhost:7113/api',
   test: 'https://localhost:7113/api',
-  production: 'http://admin.grupotepsi.com/api',
+  production: 'https://adminapi.grupotepsi.com/api',
 };
 
 const currentEnv = 'production';
