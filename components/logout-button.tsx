@@ -33,7 +33,7 @@ export const LogoutButton = () => {
     
     return (
         <button 
-            onClick={() => signOut() }
+            onClick={() => signOut({ callbackUrl: window.location.origin }) }
             className="px-4 py-3 flex items-center space-x-4 rounded-md text-gray-600 group">
             <Image
                 src={ avatarUrl }

@@ -9,13 +9,15 @@ interface Props {
   children: React.ReactNode;
 }
 
+const domain = process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost';
+
 export default function TokenProvider({ children, ...rest }: Props) {
   const { data: session } = useSession() as SessionWithUser;
 
   useEffect(() => {
     if(session){
       const token = session?.user?.token;
-      Cookies.set("token", token, { domain: ".grupotepsi.com" });
+      Cookies.set("token", token, { domain: domain });
     }else{
       Cookies.remove("token");
     }

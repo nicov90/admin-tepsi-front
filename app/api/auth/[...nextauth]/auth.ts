@@ -128,27 +128,24 @@ export const authOptions: AuthOptions = {
       
       return session;
     },
-    // async redirect({ url, baseUrl }) {
-    //   console.log(url, baseUrl);
-      
-    //   // Si la URL es relativa, prepende baseUrl
-    //   if(url.startsWith("/")){
-    //     console.log(`${baseUrl}${url}`)
-    //     return `${baseUrl}${url}`;
-    //   }
+    async redirect({ url, baseUrl }) { // para colocar correctamente el callbackUrl en la url al cerrar sesión
+      // Si la URL es relativa, prepende baseUrl
+      if(url.startsWith("/")){
+        console.log(`${baseUrl}${url}`)
+        return `${baseUrl}${url}`;
+      }
 
-    //   // if (new URL(url).origin === new URL(baseUrl).origin) {
-    //   //   console.log(url)
-    //   //   return url;
-    //   // }
-    //   const fullUrl = new URL(url);
-    //   const callbackUrl = fullUrl.searchParams.get('callbackUrl');
-    //   console.log("callbackUrl",callbackUrl)
+      // if (new URL(url).origin === new URL(baseUrl).origin) {
+      //   console.log(url)
+      //   return url;
+      // }
+      const fullUrl = new URL(url);
+      const callbackUrl = fullUrl.searchParams.get('callbackUrl');
 
-    //   if(callbackUrl) return callbackUrl;
-    //   console.log("url", url)
-    //   return url;
-    // },
+      if(callbackUrl) return callbackUrl;
+
+      return url;
+    },
   },
 
   // Custom Pages
