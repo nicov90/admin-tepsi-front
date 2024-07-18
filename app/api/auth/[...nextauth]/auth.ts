@@ -19,7 +19,7 @@ export const authOptions: AuthOptions = {
         try {
           const url = new URL(req.headers?.referer);
           const searchParams = url.searchParams;
-          const callbackUrl = searchParams.get('callbackUrl');
+          const callbackUrl = searchParams.get('callbackUrl') || '/';
 
           if(!credentials?.email || !credentials?.password){
             return null;
@@ -75,7 +75,7 @@ export const authOptions: AuthOptions = {
       // console.log('JWT Callback - Admin:', { token, account, user });
       if ( account ) {
         token.accessToken = account.access_token;
-
+        token.provider = account.provider;
         token.user = user;
         // switch( account.type ) {
         //   case 'credentials': token.user = user;
@@ -88,13 +88,14 @@ export const authOptions: AuthOptions = {
       // console.log('Session Callback - Admin:', { session, token });
 
       session.accessToken = token.accessToken as string;
+      session.provider = token.provider as string;
       const { callbackUrl = '/', ...tokenUser } = token.user;
       token.user = tokenUser as any;
       token.callbackUrl = callbackUrl as string;
       session.user = tokenUser as any || token;
       session.callbackUrl = callbackUrl as string;
 
-      if(session.user && !session?.user?.roles){
+      if(session.provider === 'azure-ad'){
         const dbUser: IUsuario = await getUsuarioByEmail(session.user.email as string);
         session.user.roles = dbUser?.roles || [];
         session.user.tipoLogin = "Microsoft";
@@ -109,16 +110,21 @@ export const authOptions: AuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) { // para colocar correctamente el callbackUrl en la url al cerrar sesión
-      // console.log('Redirect Callback - Admin:', { url, baseUrl });
-      if(url.startsWith("/")){
-        return `${baseUrl}${url}`;
-      }
+      let redirectUrl = `${baseUrl}`;
+
       const fullUrl = new URL(url);
       const callbackUrl = fullUrl.searchParams.get('callbackUrl');
 
-      if(callbackUrl) return callbackUrl;
+      if(callbackUrl) {
+        if(callbackUrl.startsWith("/")){
+          redirectUrl = `${baseUrl}${callbackUrl}`;
+        }else{
+          redirectUrl = callbackUrl;
+        }
+      }
 
-      return url;
+      console.log(`Redirect URL: ${redirectUrl}`);
+      return redirectUrl;
     },
   },
 
