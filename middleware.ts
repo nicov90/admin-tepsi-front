@@ -23,14 +23,17 @@ export async function middleware(req: NextRequest) {
         if(pathname.startsWith('/inicio') || pathname.startsWith('/roles')){
             const validRoles: RolesListaNombres[] = [ 'Admin - GENERAL' ];
             console.log("SESSION", session)
-            const userRoles = (session?.user?.roles  || session?.roles || []) as RolesListaNombres[];
-            const hasValidRole = userRoles.some((role) => validRoles.includes(role));
-        
-            if ( !hasValidRole ) {
-                const url = req.nextUrl.clone();
-                url.pathname = `/denied`;
-                url.search = '';
-                return NextResponse.redirect(url);
+            
+            if(session.user && session.user.roles){
+                const userRoles = session.user.roles as RolesListaNombres[];
+                const hasValidRole = userRoles.some((role) => validRoles.includes(role));
+            
+                if ( !hasValidRole ) {
+                    const url = req.nextUrl.clone();
+                    url.pathname = `/denied`;
+                    url.search = '';
+                    return NextResponse.redirect(url);
+                }
             }
         }
 
