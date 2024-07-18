@@ -22,7 +22,7 @@ export async function middleware(req: NextRequest) {
 
         if(pathname.startsWith('/inicio') || pathname.startsWith('/roles')){
             const validRoles: RolesListaNombres[] = [ 'Admin - GENERAL' ];
-            console.log("SESSION", session)
+            // console.log("SESSION", session)
             
             if(session.user && session.user.roles){
                 const userRoles = session.user.roles as RolesListaNombres[];

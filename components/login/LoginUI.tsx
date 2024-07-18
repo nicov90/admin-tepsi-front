@@ -81,7 +81,7 @@ const LoginUI = ({enableCustomLogin}: {enableCustomLogin: boolean}) => {
         <form onSubmit={handleSubmit(onLoginUser)} autoComplete="off" noValidate>
           <div className='w-[350px] py-10 px-5 bg-white'>
             <section className="grid container px-8 gap-2">
-              <div>
+              <div className='mb-2'>
                 <p className="text-2xl font-semibold">Iniciar sesión</p>
               </div>
 

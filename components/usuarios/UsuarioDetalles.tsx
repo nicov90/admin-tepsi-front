@@ -49,8 +49,7 @@ const UsuarioDetalles = () => {
       nombre: startCase(values.nombre.trim()),
       email: values.email.trim(),
       password: values.password === templatePassword ? null : values.password?.trim() || null,
-      roles: values.roles,
-      cargadoPor: session!.user?.id || '',
+      roles: values.roles
     }
     
     try{

@@ -64,7 +64,7 @@ export const authOptions: AuthOptions = {
       tenantId: process.env.AZURE_AD_TENANT_ID,
       profile: (profile: AzureADProfile) => ({
         id: profile.oid,
-        name: profile.name,
+        nombre: profile.name,
         email: profile.email
       }),
     }),

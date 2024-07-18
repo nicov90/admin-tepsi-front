@@ -60,7 +60,12 @@ export async function registerUsuario(body: IUsuarioNuevo, token?: string): Prom
 }
 
 export async function updateUsuario(emailToChange: string, datos: IUsuarioUpdate): Promise<any> {
-  await authApi(clientToken).patch(`/usuarios/${emailToChange}`, datos);
+  await authApi(clientToken).patch(`/usuarios/${emailToChange}`, {
+    Nombre: datos.nombre,
+    Email: datos.email,
+    Password: datos.password,
+    Roles: datos.roles
+  });
 }
 
 export async function deleteUsuario(email: string): Promise<any> {
