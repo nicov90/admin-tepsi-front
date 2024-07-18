@@ -6,7 +6,6 @@ import { capitalize } from 'lodash';
 import { IUsuario } from '@/interfaces/usuarios';
 import { getUsuarioByEmail, registerUsuario } from '@/database/dbUsuarios';
 import { authApi } from "@/apiAxios/authApi";
-import { NextResponse } from "next/server";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -73,6 +72,7 @@ export const authOptions: AuthOptions = {
 
   callbacks: {
     async jwt({ token, account, user }) { // Devuelve el token al navegador
+      console.log('JWT Callback - Admin:', { token, account, user });
       if ( account ) {
         token.accessToken = account.access_token;
 
@@ -84,6 +84,8 @@ export const authOptions: AuthOptions = {
       return token;
     },
     async session({ session, token }: any){  // reemplaza los valores del token en la sesion
+      console.log('Session Callback - Admin:', { session, token });
+
       session.accessToken = token.accessToken as string;
       const { callbackUrl, ...tokenUser } = token.user;
       token.user = tokenUser as any;
@@ -91,54 +93,25 @@ export const authOptions: AuthOptions = {
       session.user = tokenUser as any || token;
       session.callbackUrl = callbackUrl as string;
 
-      // @ts-ignore
       if(session.user && !session?.user?.roles){
         const dbUser: IUsuario = await getUsuarioByEmail(session.user.email as string);
-        // @ts-ignore
         session.user.roles = dbUser?.roles || ['Usuario'];
-        // @ts-ignore
-        // session.user.activo = dbUser?.activo || true;
-        // @ts-ignore
         session.user.tipoLogin = "Microsoft";
 
         const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
             azureToken: session.accessToken,
           })).data.token;
-        // @ts-ignore
+
         session.user.token = newToken;
       }
-
-      // if(session.user){
-      //   // // @ts-ignore
-      //   const newToken = await externalApiConToken().post(`/Auth/Revalidar/${session.user.token}`).then(res => res.data.token).catch(err => {
-      //     console.log(err);
-      //     // @ts-ignore
-      //     return session.user.token;
-      //   });
-      //   // @ts-ignore
-      //   session.user.token = newToken;
-      //   res.setHeader('Set-Cookie', `token=${newToken};path=/`)
-      // }
-
-       // Redirigir al callbackUrl después del inicio de sesión
-      //  if (session.user && session.callbackUrl) {
-      //   const redirectUrl = new URL(session.callbackUrl, process.env.NEXT_PUBLIC_APP_URL);
-      //   return NextResponse.redirect(redirectUrl.toString());
-      // }
       
       return session;
     },
     async redirect({ url, baseUrl }) { // para colocar correctamente el callbackUrl en la url al cerrar sesión
-      // Si la URL es relativa, prepende baseUrl
+      console.log('Redirect Callback - Admin:', { url, baseUrl });
       if(url.startsWith("/")){
-        console.log(`${baseUrl}${url}`)
         return `${baseUrl}${url}`;
       }
-
-      // if (new URL(url).origin === new URL(baseUrl).origin) {
-      //   console.log(url)
-      //   return url;
-      // }
       const fullUrl = new URL(url);
       const callbackUrl = fullUrl.searchParams.get('callbackUrl');
 
@@ -185,38 +158,7 @@ export const authOptions: AuthOptions = {
       }
     }
   },
-  // cookies: {
-  //   sessionToken: {
-  //     name: `__Secure-next-auth.session-token`,
-  //     options: {
-  //       httpOnly: true,
-  //       sameSite: 'lax',
-  //       path: '/',
-  //       secure: true,
-  //       domain: '.grupotepsi.com'
-  //     }
-  //   },
-  //   callbackUrl: {
-  //     name: `__Secure-next-auth.callback-url`,
-  //     options: {
-  //       sameSite: 'lax',
-  //       path: '/',
-  //       secure: true,
-  //       domain: '.grupotepsi.com'
-  //     }
-  //   },
-  //   csrfToken: {
-  //     name: `__Host-next-auth.csrf-token`,
-  //     options: {
-  //       httpOnly: true,
-  //       sameSite: 'lax',
-  //       path: '/',
-  //       secure: true,
-  //       domain: '.grupotepsi.com'
-  //     }
-  //   },
-  // }
-
+  debug: true,
   cookies: {
     sessionToken: {
       name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : `next-auth.session-token`,
