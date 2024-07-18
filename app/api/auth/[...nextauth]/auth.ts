@@ -72,22 +72,23 @@ export const authOptions: AuthOptions = {
 
   callbacks: {
     async jwt({ token, account, user }) { // Devuelve el token al navegador
-      console.log('JWT Callback - Admin:', { token, account, user });
+      // console.log('JWT Callback - Admin:', { token, account, user });
       if ( account ) {
         token.accessToken = account.access_token;
 
-        switch( account.type ) {
-          case 'credentials': token.user = user;
-            break;
-        }
+        token.user = user;
+        // switch( account.type ) {
+        //   case 'credentials': token.user = user;
+        //     break;
+        // }
       }
       return token;
     },
     async session({ session, token }: any){  // reemplaza los valores del token en la sesion
-      console.log('Session Callback - Admin:', { session, token });
+      // console.log('Session Callback - Admin:', { session, token });
 
       session.accessToken = token.accessToken as string;
-      const { callbackUrl, ...tokenUser } = token.user;
+      const { callbackUrl = '/', ...tokenUser } = token.user;
       token.user = tokenUser as any;
       token.callbackUrl = callbackUrl as string;
       session.user = tokenUser as any || token;
@@ -95,7 +96,7 @@ export const authOptions: AuthOptions = {
 
       if(session.user && !session?.user?.roles){
         const dbUser: IUsuario = await getUsuarioByEmail(session.user.email as string);
-        session.user.roles = dbUser?.roles || ['Usuario'];
+        session.user.roles = dbUser?.roles || [];
         session.user.tipoLogin = "Microsoft";
 
         const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
@@ -108,7 +109,7 @@ export const authOptions: AuthOptions = {
       return session;
     },
     async redirect({ url, baseUrl }) { // para colocar correctamente el callbackUrl en la url al cerrar sesión
-      console.log('Redirect Callback - Admin:', { url, baseUrl });
+      // console.log('Redirect Callback - Admin:', { url, baseUrl });
       if(url.startsWith("/")){
         return `${baseUrl}${url}`;
       }
@@ -158,7 +159,6 @@ export const authOptions: AuthOptions = {
       }
     }
   },
-  debug: true,
   cookies: {
     sessionToken: {
       name: process.env.NODE_ENV === 'production' ? '__Secure-next-auth.session-token' : `next-auth.session-token`,
