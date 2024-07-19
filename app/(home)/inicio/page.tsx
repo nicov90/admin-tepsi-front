@@ -10,7 +10,7 @@ const Inicio = () => {
   const { listaUsuarios } = useContext(UsuariosRolesContext);
 
   return (
-    <div className="flex min-h-screen flex-col py-10 px-1 lg:px-28">
+    <div className="flex flex-col py-10 px-1 lg:px-28">
       <h1 className="text-[1.6rem] md:text-3xl font-bold py-3 pb-4 text-center">Usuarios</h1>
       {listaUsuarios ? (
         <DataTable 

@@ -21,10 +21,9 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Button } from "./button"
-import { useEffect, useState } from "react"
-import { ListFilter, Search } from "lucide-react"
+import { useState } from "react"
+import { Search } from "lucide-react"
 import { Input } from "./input"
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuTrigger } from "./dropdown-menu"
 import { useWindowSize } from "@/hooks/useWindowSize"
 
 interface DataTableProps<TData, TValue> {
@@ -81,7 +80,7 @@ export function DataTable<TData, TValue>({
         <div className="flex items-center w-full">
           {children}
           <div className="relative flex items-center w-full">
-            <Search className="absolute left-3 top-[19px] transform -translate-y-1/2 z-50" size={16}/>
+            <Search className="absolute left-3 top-[19px] transform -translate-y-1/2 z-10" size={16}/>
             <Input 
               type="text" 
               placeholder={searchPlaceholder ? searchPlaceholder : "Buscar..."} 
@@ -92,54 +91,6 @@ export function DataTable<TData, TValue>({
             ></Input>
           </div>
         </div>
-        {/* <DropdownMenu
-          >
-          <DropdownMenuTrigger>
-            <div className='px-2 py-2.5 border rounded-md border-gray-300'>
-              <ListFilter size={19}/>
-            </div>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent>
-            {estado === 'PENDIENTE' ? (
-              <>
-                <DropdownMenuLabel>Filtrar por estado</DropdownMenuLabel>
-                <DropdownMenuItem style={{ padding: 0 }}>
-                  <DropdownMenuCheckboxItem
-                    checked={!(table.getColumn("SubEstado")?.getFilterValue() as string)}
-                    onCheckedChange={() => table.getColumn("SubEstado")?.setFilterValue(undefined)}
-                    className="w-[140px]"
-                  >
-                    Todos
-                  </DropdownMenuCheckboxItem>
-                </DropdownMenuItem>
-                {estados.map((item, index) => (
-                  <DropdownMenuItem key={index} style={{ padding: 0}}>
-                    <DropdownMenuCheckboxItem
-                      checked={(table.getColumn("SubEstado")?.getFilterValue() as string) === item}
-                      onCheckedChange={() => table.getColumn("SubEstado")?.setFilterValue(item)}
-                      className="w-[140px]"
-                    >
-                      {item}
-                    </DropdownMenuCheckboxItem>
-                  </DropdownMenuItem>
-                ))}
-              </>
-            ) : (
-              <>
-                <DropdownMenuLabel>Filtrar por función</DropdownMenuLabel>
-                <DropdownMenuItem style={{ padding: 0 }}>
-                  <DropdownMenuCheckboxItem
-                    checked={!(table.getColumn("Tipo")?.getFilterValue() as string)}
-                    onCheckedChange={() => table.getColumn("Tipo")?.setFilterValue(undefined)}
-                    className="w-[150px]"
-                  >
-                    Todos
-                  </DropdownMenuCheckboxItem>
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu> */}
       </div>
       <div className="rounded-md border">
         <Table>

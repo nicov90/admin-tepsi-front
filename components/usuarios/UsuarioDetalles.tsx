@@ -1,7 +1,7 @@
 'use client'
 import React, { useContext, useEffect, useState } from 'react'
 import { Button } from '../ui/button'
-import { DialogContent, DialogTitle } from '../ui/dialog'
+import { DialogContent, DialogDescription, DialogTitle } from '../ui/dialog'
 import { startCase } from 'lodash'
 import { useSession } from 'next-auth/react'
 import { IUsuarioNuevo, IUsuarioUpdate } from '@/interfaces/usuarios'
@@ -25,7 +25,7 @@ import { SessionWithUser } from '@/interfaces/session'
 const templatePassword = 'AAAAAAAAAAAAA';
 
 const UsuarioDetalles = () => {
-  const { data: session } = useSession() as SessionWithUser;
+  const { update: updateSession } = useSession() as SessionWithUser;
   const { push } = useRouter();
   const pathname = usePathname();
   const { listaUsuarios, refreshUsuarios, listaRoles } = useContext(UsuariosRolesContext);
@@ -57,6 +57,7 @@ const UsuarioDetalles = () => {
         await updateUsuario(usuario.email, formattedValues);
         refreshUsuarios();
         toast.success("Usuario modificado", { style: { backgroundColor: "green", color: "white" } });
+        updateSession();
         push(pathname);
       }
     }catch(err){
@@ -85,11 +86,11 @@ const UsuarioDetalles = () => {
     <>
     {usuario && usuario.id === idUsuarioUrl && (
       <DialogContent className="sm:max-w-[460px] py-10">
-        <>
         <div
           id="user_add"
           className="flex flex-col gap-1 my-1 mx-5"
         >
+          <DialogDescription className='hidden'></DialogDescription>
           <DialogTitle className='w-full'>
             <p className="mb-5 text-start text-xl font-bold">Editar usuario</p>
           </DialogTitle>
@@ -226,11 +227,10 @@ const UsuarioDetalles = () => {
                   )}
                 />
               )}
-              <Button type="submit" className='w-full' style={{ marginTop: 30 }}>Editar</Button>
+              <Button type="submit" className='w-full' style={{ marginTop: 30 }}>Guardar</Button>
             </form>
           </Form>
         </div>
-        </>
       </DialogContent>  
     )}
   </>

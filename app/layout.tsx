@@ -27,7 +27,7 @@ export default function RootLayout({
       <TokenProvider>
         <UsuariosRolesProvider>
           <html lang="en" suppressHydrationWarning>
-            <body className={poppins.className} style={{ backgroundColor: "white" }}>
+            <body className={`${poppins.className} bg-white overflow-x-hidden`}>
               <ThemeProvider>
               {/* <ThemeProvider attribute="class" defaultTheme="dark" enableSystem> */}
                 <Suspense>

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import { Button } from '../ui/button'
 import { UsersIcon } from 'lucide-react'
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '../ui/dialog'
 import { getUsuariosByRol } from '@/database/dbUsuarios'
 import { IUsuario } from '@/interfaces/usuarios'
 import { Table, TableBody, TableCell, TableRow } from '../ui/table'
@@ -44,6 +44,7 @@ const UsuariosRolModal = ({ row }: any) => {
         <div
           className="flex flex-col gap-1 my-1 mx-5"
         >
+          <DialogDescription className='hidden'></DialogDescription>
           <DialogTitle className='w-full mb-5 text-start text-lg flex flex-col'>
             <p className='text-gray-700'>Usuarios que poseen el rol:</p>
             <p className='font-bold text-xl'>{rolNombre}</p>

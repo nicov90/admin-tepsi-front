@@ -8,11 +8,8 @@ export default function HomeLayout({
   return (
     <>
       <Navbar />
-      <main className="pt-14 md:pt-14 px-4 w-full mx-auto">
+      <main className="pt-14 md:pt-14 px-4 w-full mx-auto overflow-x-hidden">
         <div className="flex gap-x-7">
-            {/* <div className="w-64 shrink-0 hidden md:block">
-                <Sidebar />
-            </div> */}
             <div className="w-full">
                 {children}
             </div>

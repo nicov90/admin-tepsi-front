@@ -95,9 +95,10 @@ export const authOptions: AuthOptions = {
       session.user = tokenUser as any || token;
       session.callbackUrl = callbackUrl as string;
 
+      const dbUser: IUsuario = await getUsuarioByEmail(session.user.email as string);
+      session.user.roles = dbUser?.roles || [];
+
       if(session.provider === 'azure-ad'){
-        const dbUser: IUsuario = await getUsuarioByEmail(session.user.email as string);
-        session.user.roles = dbUser?.roles || [];
         session.user.tipoLogin = "Microsoft";
 
         const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {

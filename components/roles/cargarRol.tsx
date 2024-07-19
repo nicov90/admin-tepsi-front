@@ -1,7 +1,7 @@
 'use client'
 import React, { useContext, useState } from 'react'
 import { Button } from '../ui/button'
-import { Dialog, DialogContent, DialogFooter, DialogTitle, DialogTrigger } from '../ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogTitle, DialogTrigger } from '../ui/dialog'
 import { Label } from '../ui/label'
 import { startCase } from 'lodash'
 import { Rol, RolNuevo } from '@/interfaces/roles'
@@ -57,6 +57,7 @@ const CargarRol = () => {
           <DialogTitle>
             <p className="mb-0 text-start text-xl font-bold">Crear nuevo rol</p>
           </DialogTitle>
+          <DialogDescription className='hidden'></DialogDescription>
           <div className="flex flex-col gap-5 my-3">
             <div className='flex flex-col items-start gap-3'>
               <Label htmlFor="rol_nombre">

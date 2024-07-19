@@ -1,6 +1,6 @@
 'use client'
 import React, { useContext, useEffect, useState } from 'react'
-import { DialogContent, DialogTitle } from '../ui/dialog'
+import { DialogContent, DialogDescription, DialogTitle } from '../ui/dialog'
 import { UsuariosRolesContext } from '@/providers/usuariosRoles-provider'
 import { toast } from 'sonner'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
@@ -47,6 +47,7 @@ const RolDetalles = () => {
           <DialogTitle className='w-full'>
             <p className="mb-2 text-start text-xl font-bold">Editar descripción del rol</p>
           </DialogTitle>
+          <DialogDescription className='hidden'></DialogDescription>
           <Textarea
             placeholder="Describir el rol..."
             value={rolDescripcion}

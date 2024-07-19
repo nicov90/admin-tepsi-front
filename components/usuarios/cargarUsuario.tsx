@@ -1,7 +1,7 @@
 'use client'
 import React, { useContext, useState } from 'react'
 import { Button } from '../ui/button'
-import { Dialog, DialogContent, DialogTitle, DialogTrigger } from '../ui/dialog'
+import { Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from '../ui/dialog'
 import { startCase } from 'lodash'
 import { useSession } from 'next-auth/react'
 import { IUsuarioNuevo } from '@/interfaces/usuarios'
@@ -108,6 +108,7 @@ const CargarUsuario = () => {
           id="user_add"
           className="flex flex-col gap-1 my-1 mx-5"
         >
+          <DialogDescription className='hidden'></DialogDescription>
           <DialogTitle className='w-full'>
             <p className="mb-5 text-start text-xl font-bold">Crear nuevo usuario</p>
           </DialogTitle>
