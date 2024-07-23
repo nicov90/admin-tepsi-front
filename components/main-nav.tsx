@@ -31,20 +31,26 @@ export function MainNav({
     ];
 
     return (
-        <nav
-            className={ cn("flex items-center space-x-4 lg:space-x-6", className) }
-        >
-            { width > 768 && routes.map(( route ) => (
-                <Link 
-                    key={ route.href }
-                    href={ route.href }
-                    className={ cn( "text-sm font-medium transition-colors hover:text-primary",
-                    route.active ? "text-black dark:text-white" : "text-muted-foreground" )}
-                >
-                    { route.label }
-                </Link>
-            ))}
-        </nav>
-    );   
+        <>
+            { width > 768 && (
+                <div className="flex items-center px-4 py-1 border-l-2 border-[#707272]" >
+                    <nav
+                        className={ cn("flex items-center space-x-4 lg:space-x-6", className) }
+                    >
+                        { routes.map(( route ) => (
+                            <Link 
+                                key={ route.href }
+                                href={ route.href }
+                                className={ cn( "text-sm font-medium transition-colors hover:text-primary",
+                                route.active ? "text-black dark:text-white" : "text-muted-foreground" )}
+                            >
+                                { route.label }
+                            </Link>
+                        ))}
+                    </nav>
+                </div>
+            )}
+        </>
+    );
 };
 

@@ -101,31 +101,44 @@ export const authOptions: AuthOptions = {
       if(session.provider === 'azure-ad'){
         session.user.tipoLogin = "Microsoft";
 
-        const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
-            azureToken: session.accessToken,
-          })).data.token;
+        // const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
+        //     azureToken: session.accessToken,
+        //   })).data.token;
 
-        session.user.token = newToken;
+        // session.user.token = newToken;
       }
       
       return session;
     },
     async redirect({ url, baseUrl }) { // para colocar correctamente el callbackUrl en la url al cerrar sesión
-      let redirectUrl = `${baseUrl}`;
+
+      if(url.startsWith("/")){
+        return `${baseUrl}${url}`;
+      }
 
       const fullUrl = new URL(url);
       const callbackUrl = fullUrl.searchParams.get('callbackUrl');
 
-      if(callbackUrl) {
-        if(callbackUrl.startsWith("/")){
-          redirectUrl = `${baseUrl}${callbackUrl}`;
-        }else{
-          redirectUrl = callbackUrl;
-        }
-      }
+      if(callbackUrl) return callbackUrl;
 
-      console.log(`Redirect URL: ${redirectUrl}`);
-      return redirectUrl;
+      return url;
+
+      // console.log(url, baseUrl)
+      // let redirectUrl = `${baseUrl}`;
+
+      // const fullUrl = new URL(url);
+      // const callbackUrl = fullUrl.searchParams.get('callbackUrl');
+
+      // if(callbackUrl) {
+      //   if(callbackUrl.startsWith("/")){
+      //     redirectUrl = `${baseUrl}${callbackUrl}`;
+      //   }else{
+      //     redirectUrl = callbackUrl;
+      //   }
+      // }
+      
+      // console.log(`Redirect URL: ${redirectUrl}`);
+      // return redirectUrl;
     },
   },
 
