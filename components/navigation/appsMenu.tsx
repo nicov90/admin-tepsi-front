@@ -73,7 +73,7 @@ const AppsMenu = ({ className, position = 'left' }: Props) => {
             leaveTo="transform scale-75 opacity-0"
           >
             <MenuItems 
-              className={`absolute ${position === 'left' && `-left-3`} ${position === 'right' && `-right-[60px]`} w-svw max-w-[400px] mt-2 px-3 py-2 bg-white border border-gray-200 rounded-xl divide-y divide-gray-100 shadow-lg ring-1
+              className={`absolute ${position === 'left' && `-left-2`} ${position === 'right' && `-right-[58px]`} w-svw max-w-[400px] mt-2 px-3 py-2 bg-white border border-gray-200 rounded-xl divide-y divide-gray-100 shadow-lg ring-1
             ring-black ring-opacity-5 focus:outline-none`}
               static
             >
