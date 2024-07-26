@@ -32,7 +32,7 @@ type Props = {
   position?: 'left' | 'right'
 }
 const AppsMenu = ({ className, position = 'left' }: Props) => {
-  const { data: session, status } = useSession() as SessionWithUser;
+  const { data: session } = useSession() as SessionWithUser;
 
    // código para filtrar las apps a mostrar si el usuario no tiene ningun rol de esa app.
    const userHasRoleForApp = (appName: string) => {

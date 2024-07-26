@@ -6,6 +6,8 @@ import { capitalize } from 'lodash';
 import { IUsuario } from '@/interfaces/usuarios';
 import { getUsuarioByEmail, registerUsuario } from '@/database/dbUsuarios';
 import { authApi } from "@/apiAxios/authApi";
+import dayjs from "dayjs";
+import { jwtDecode } from 'jwt-decode';
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -62,11 +64,12 @@ export const authOptions: AuthOptions = {
       clientId: process.env.AZURE_AD_CLIENT_ID!,
       clientSecret: process.env.AZURE_AD_CLIENT_SECRET!,
       tenantId: process.env.AZURE_AD_TENANT_ID,
-      profile: (profile: AzureADProfile) => ({
+      profile: (profile: AzureADProfile) => {
+        return ({
         id: profile.oid,
         nombre: profile.name,
-        email: profile.email
-      }),
+        email: profile.email,
+      })},
     }),
   ],
 
@@ -101,11 +104,41 @@ export const authOptions: AuthOptions = {
       if(session.provider === 'azure-ad'){
         session.user.tipoLogin = "Microsoft";
 
-        const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
-            azureToken: session.accessToken,
-          })).data.token;
+        // const currentTime = dayjs();
+        // const lastUpdated = session.user.lastUpdated ? dayjs(session.user.lastUpdated) : null;
 
-        session.user.token = newToken;
+        // if (!lastUpdated || currentTime.diff(lastUpdated, 'hour') >= 24) {
+        //   // Actualizar el token
+        //   const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
+        //       azureToken: session.accessToken,
+        //   })).data.token;
+  
+        //   session.user.token = newToken;
+        //   session.user.lastUpdated = currentTime.toISOString(); // Actualizar lastUpdated con la fecha y hora actuales
+        // }
+
+        let tokenExpired = false;
+        if (session.user.token) {
+          try {
+              const decodedToken = jwtDecode(session.user.token);
+              const expirationTime = dayjs.unix(decodedToken.exp!);
+              tokenExpired = dayjs().isAfter(expirationTime);
+          } catch (error) {
+              console.error("Error decoding token:", error);
+              tokenExpired = true;
+          }
+        }
+
+        if (!session.user.token || tokenExpired) {
+          try {
+            const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
+              azureToken: session.accessToken,
+            })).data.token;
+            session.user.token = newToken;
+          } catch (error) {
+            console.error("Error refreshing token:", error);
+          }
+        }
       }
       
       return session;

@@ -21,12 +21,11 @@ export async function middleware(req: NextRequest) {
     }else{
 
         if(pathname.startsWith('/inicio') || pathname.startsWith('/roles')){
-            const validRoles: RolesListaNombres[] = [ 'Admin - GENERAL' ];
-            // console.log("SESSION", session)
+            const validRolesPrefix = 'Admin';
             
             if(session.user && session.user.roles){
                 const userRoles = session.user.roles as RolesListaNombres[];
-                const hasValidRole = userRoles.some((role) => validRoles.includes(role));
+                const hasValidRole = userRoles.some((role) => role.startsWith(validRolesPrefix));
             
                 if ( !hasValidRole ) {
                     const url = req.nextUrl.clone();

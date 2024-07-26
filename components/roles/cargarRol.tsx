@@ -11,10 +11,18 @@ import { Input } from '../ui/input'
 import { toast } from 'sonner'
 import { insertRole } from '@/database/dbRoles'
 import { Textarea } from '../ui/textarea'
+import { useSession } from 'next-auth/react'
+import { SessionWithUser } from '@/interfaces/session'
 
 const CargarRol = () => {
-  const { refreshRoles, listaRoles } = useContext(UsuariosRolesContext);
-  const listaModulos = listaRoles ? [...new Set([...listaRoles.map((rol: Rol) => rol.Modulo)])] : [];
+  const { data: session } = useSession() as SessionWithUser;
+  const { refreshRoles, listaRoles, modulosAdminUsuario } = useContext(UsuariosRolesContext);
+  const listaModulos = listaRoles 
+    ? [...new Set([...listaRoles.map((rol: Rol) => rol.Modulo)])]
+    : [];
+
+  const tieneAdminGeneral = session?.user.roles?.includes('Admin - GENERAL');
+  const modulosVisibles = tieneAdminGeneral ? listaModulos : modulosAdminUsuario
 
   const [openModal, setOpenModal] = useState(false);
   const [nuevoRol, setNuevoRol] = useState<RolNuevo>({
@@ -76,7 +84,7 @@ const CargarRol = () => {
                 Módulo
               </Label>
               <MultipleSelector
-                options={listaModulos.map((modulo) => ({
+                options={modulosVisibles.map((modulo) => ({
                   value: modulo,
                   label: modulo,
                 }))}
@@ -88,7 +96,7 @@ const CargarRol = () => {
                 onChange={(e) => {
                   setNuevoRol({ ...nuevoRol, Modulo: e.length > 0 ? (e[0].value).toUpperCase() : '' });
                 }}
-                creatable
+                creatable={tieneAdminGeneral}
                 maxSelected={1}
                 onMaxSelected={() => toast.error('Solo puede agregar un módulo', { style: { backgroundColor: 'red', color: 'white' } })}
                 className='-mb-2'

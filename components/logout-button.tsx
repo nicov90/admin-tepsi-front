@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession, signOut, signIn } from "next-auth/react";
-import { LogIn, LogOut, PlusCircle, Store as StoreIcon } from "lucide-react";
+import { Loader2Icon, LogIn, LogOut, PlusCircle, Store as StoreIcon } from "lucide-react";
 import Image from "next/image";
 import { SessionWithUser } from "@/interfaces/session";
 import { useWindowSize } from "@/hooks/useWindowSize";
@@ -17,6 +17,7 @@ export const LogoutButton = () => {
     if ( status === 'loading' ) {
         return (
         <button className="px-4 py-3 flex items-center space-x-4 rounded-md text-gray-600 group">
+            <Loader2Icon className="w-5 h-5 animate-spin" />
             <span className="group-hover:text-gray-700">Cargando...</span>
         </button>
         )
@@ -55,11 +56,11 @@ export const LogoutButton = () => {
             </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent className="mr-2">
-                <DropdownMenuLabel className="px-4">{startCase(session?.user.nombre.toLowerCase())}</DropdownMenuLabel>
+                <DropdownMenuLabel className="px-4 text-center">{startCase(session?.user.nombre.toLowerCase())}</DropdownMenuLabel>
                 <DropdownMenuSeparator className="bg-gray-200"/>
                 <DropdownMenuItem 
                     onClick={handleSignOut}
-                    className="text-red-500 justify-center"
+                    className="text-red-500 justify-center text-center"
                 >
                     Cerrar sesión
                 </DropdownMenuItem>
