@@ -101,11 +101,11 @@ export const authOptions: AuthOptions = {
       if(session.provider === 'azure-ad'){
         session.user.tipoLogin = "Microsoft";
 
-        // const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
-        //     azureToken: session.accessToken,
-        //   })).data.token;
+        const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
+            azureToken: session.accessToken,
+          })).data.token;
 
-        // session.user.token = newToken;
+        session.user.token = newToken;
       }
       
       return session;

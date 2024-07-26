@@ -26,7 +26,7 @@ export function MainNav({
         {
             href: `/roles`,
             label: 'Roles',
-            active: pathname === `/usuarios`,
+            active: pathname === `/roles`,
         },
     ];
 

@@ -6,6 +6,12 @@
     color-scheme: light !important;
   }
 
+  * {
+    outline: none;
+    box-sizing: border-box;
+    scrollbar-width: thin;
+  }
+
   *::-webkit-scrollbar {
     width: 12px;
   }
