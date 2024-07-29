@@ -25,7 +25,7 @@ import { SessionWithUser } from '@/interfaces/session'
 const templatePassword = 'AAAAAAAAAAAAA';
 
 const UsuarioDetalles = () => {
-  const { update: updateSession } = useSession() as SessionWithUser;
+  const { data: session, update: updateSession } = useSession() as SessionWithUser;
   const { push } = useRouter();
   const pathname = usePathname();
   const { listaUsuarios, refreshUsuarios, listaRoles } = useContext(UsuariosRolesContext);
@@ -57,7 +57,9 @@ const UsuarioDetalles = () => {
         await updateUsuario(usuario.email, formattedValues);
         refreshUsuarios();
         toast.success("Usuario modificado", { style: { backgroundColor: "green", color: "white" } });
-        updateSession();
+        if(usuario.email === session?.user?.email){
+          updateSession();
+        }
         push(pathname);
       }
     }catch(err){
