@@ -152,7 +152,13 @@ export const authOptions: AuthOptions = {
       const fullUrl = new URL(url);
       const callbackUrl = fullUrl.searchParams.get('callbackUrl');
 
-      if(callbackUrl) return callbackUrl;
+      if(callbackUrl) {
+        if(callbackUrl.startsWith("/")){
+          return `${baseUrl}${callbackUrl}`;
+        }
+
+        return callbackUrl;
+      };
 
       return url;
 
