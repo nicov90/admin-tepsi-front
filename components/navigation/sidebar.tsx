@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { Accordion, AccordionItem } from "@/components/ui/accordion";
 import { usePathname } from "next/navigation";
+import getRoutes from "../../utils/navigation/routes";
 
 interface SidebarProps {
   storageKey?: string;
@@ -12,19 +13,7 @@ export const Sidebar = ({
   storageKey = "t-sidebar-state",
 }: SidebarProps) => {
   const pathname = usePathname();
-
-  const routes = [
-    {
-        href: `/inicio`,
-        label: 'Inicio',
-        active: pathname === `/inicio`,
-    },
-    {
-        href: `/roles`,
-        label: 'Roles',
-        active: pathname === `/roles`,
-    },
-];
+  const routes = getRoutes();
 
   return (
     <div className="px-5">
@@ -33,16 +22,20 @@ export const Sidebar = ({
         type="single"
         className="space-y-2 px-1 text-[15px]"
       >
-        {routes.map((route) => (
-          <AccordionItem
-            key={route.href}
-            value={route.href}
-            className={`py-2 ${route.active ? "border-b-black font-medium" : "border-b-gray-300"}`}
-            style={{ color: route.active ? "black" : "rgb(0,0,0,0.85)" }}
-          >
-            <Link href={route.href}>{route.label}</Link>
-          </AccordionItem>
-        ))}
+        {routes.map((route) => {
+          const active = pathname === route.href;
+
+          return (
+            <AccordionItem
+              key={route.href}
+              value={route.href}
+              className={`py-2 ${active ? "border-b-black font-medium" : "border-b-gray-300"}`}
+              style={{ color: active ? "black" : "rgb(0,0,0,0.85)", display: route.hidden ? 'none' : 'block' }}
+            >
+              <Link href={route.href}>{route.label}</Link>
+            </AccordionItem>
+          )}
+        )}
       </Accordion>
     </div>
   );

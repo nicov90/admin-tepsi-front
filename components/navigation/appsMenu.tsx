@@ -51,6 +51,10 @@ const AppsMenu = ({ className, position = 'left' }: Props) => {
     });
   };
   const filteredApps = apps.filter(app => userHasRoleForApp(app.name));
+
+  const numApps = filteredApps.length;
+  const nroColumns = 3;
+  const numSiluetas = numApps < nroColumns ? nroColumns - numApps : (numApps % nroColumns === 0 ? 0 : nroColumns - (numApps % nroColumns));
   
   return (
     <Menu as="div" className="relative inline-block text-left z-50">
@@ -109,6 +113,12 @@ const AppsMenu = ({ className, position = 'left' }: Props) => {
                     )}
                   </MenuItem>
                 ))}
+                {/* Renderiza las siluetas para llenar los espacios vacíos */}
+                {Array.from({ length: numSiluetas }).map((_, index) => (
+                  <MenuItem key={`silhouette-${index}`}>
+                    <Silueta />
+                  </MenuItem>
+                ))}
               </div>
             </MenuItems>
           </Transition>
@@ -117,5 +127,15 @@ const AppsMenu = ({ className, position = 'left' }: Props) => {
     </Menu>
   )
 }
+
+// Componente de silueta
+const Silueta = () => (
+  <div className="flex flex-col items-center justify-center py-2 text-sm text-gray-300 rounded-xl">
+    <div className="flex flex-col items-center justify-center py-2 w-full">
+      <div className="w-6 h-6 opacity-90 bg-gray-50 rounded-lg"></div>
+      <div className="mt-2 text-gray-100 text-xs">Vacío</div>
+    </div>
+  </div>
+);
 
 export default AppsMenu

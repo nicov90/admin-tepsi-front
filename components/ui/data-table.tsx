@@ -46,28 +46,32 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   )
+  const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 7 })
+
   const table = useReactTable({
     data,
     columns,
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
-    onSortingChange: setSorting,
     getSortedRowModel: getSortedRowModel(),
-    onColumnFiltersChange: setColumnFilters,
     getFilteredRowModel: getFilteredRowModel(),
+    onPaginationChange: setPagination,
     state: {
       sorting,
       columnFilters,
+      pagination
     },
   })
 
-  const targetRowCount = 10;
+  const targetRowCount = pagination.pageSize;
 
   const currentRowCount = table.getRowModel().rows?.length || 0;
   const emptyRowsCount = Math.max(targetRowCount - currentRowCount, 0);
 
   const emptyRows = Array.from({ length: emptyRowsCount }).map((_, index) => (
-    <TableRow key={`empty-row-${index}`} className="text-center h-8 border-b-0">
+    <TableRow key={`empty-row-${index}`} className="text-center h-12 border-b-0">
       {columns.map((column) => (
         <TableCell key={`empty-cell-${index}-${column.header}`} className="h-full"></TableCell>
       ))}
