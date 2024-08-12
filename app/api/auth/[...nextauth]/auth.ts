@@ -8,6 +8,7 @@ import { getUsuarioByEmail, registerUsuario } from '@/database/dbUsuarios';
 import { authApi } from "@/apiAxios/authApi";
 import dayjs from "dayjs";
 import { jwtDecode } from 'jwt-decode';
+import getProfilePhoto from "@/utils/azureAD";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -80,9 +81,15 @@ export const authOptions: AuthOptions = {
         token.accessToken = account.access_token;
         token.provider = account.provider;
         token.user = user;
-        // switch( account.type ) {
-        //   case 'credentials': token.user = user;
-        //     break;
+        token.image = null;
+
+        // if(account.provider === 'azure-ad'){
+        //   try {
+        //     const photo = await getProfilePhoto(account.access_token!);
+        //     token.image = photo;
+        //   } catch (error) {
+        //     console.error('Error al obtener la imagen de perfil:', error);
+        //   }
         // }
       }
       return token;
@@ -97,25 +104,13 @@ export const authOptions: AuthOptions = {
       token.callbackUrl = callbackUrl as string;
       session.user = tokenUser as any || token;
       session.callbackUrl = callbackUrl as string;
+      session.image = token.image as string;
 
       const dbUser: IUsuario = await getUsuarioByEmail(session.user.email as string);
       session.user.roles = dbUser?.roles || [];
 
       if(session.provider === 'azure-ad'){
         session.user.tipoLogin = "Microsoft";
-
-        // const currentTime = dayjs();
-        // const lastUpdated = session.user.lastUpdated ? dayjs(session.user.lastUpdated) : null;
-
-        // if (!lastUpdated || currentTime.diff(lastUpdated, 'hour') >= 24) {
-        //   // Actualizar el token
-        //   const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
-        //       azureToken: session.accessToken,
-        //   })).data.token;
-  
-        //   session.user.token = newToken;
-        //   session.user.lastUpdated = currentTime.toISOString(); // Actualizar lastUpdated con la fecha y hora actuales
-        // }
 
         let tokenExpired = false;
         if (session.user.token) {
@@ -139,6 +134,9 @@ export const authOptions: AuthOptions = {
             console.error("Error refreshing token:", error);
           }
         }
+
+        // const photo = await getProfilePhoto(session.access_token!);
+        // session.user.image = photo;
       }
       
       return session;

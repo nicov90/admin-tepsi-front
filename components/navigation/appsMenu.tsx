@@ -1,6 +1,6 @@
 "use client"
 import React, { useEffect, useRef, useState } from 'react'
-import { ClipboardList, GripIcon, UserRoundCog, Wallet } from 'lucide-react'
+import { ClipboardList, GripIcon, ShirtIcon, UserRoundCog, Wallet } from 'lucide-react'
 import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import { useSession } from 'next-auth/react'
@@ -18,6 +18,12 @@ const apps = [
     link: "https://partenovedades.grupotepsi.com",
     description: "Sistema de parte de novedades",
     imageComponent: () => <ClipboardList className="w-6 h-6" />
+  },
+  {
+    name: "EPP",
+    link: "https://epp.grupotepsi.com",
+    description: "Sistema de elementos de protección personal",
+    imageComponent: () => <ShirtIcon className="w-6 h-6" />
   },
   {
     name: "Usuarios",

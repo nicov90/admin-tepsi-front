@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt';
-import { getCookie, getCookies, setCookie } from 'cookies-next';
 import { JWTWithUser } from './interfaces/session';
 import { RolesListaNombres } from './interfaces/roles';
 
@@ -22,7 +21,6 @@ export async function middleware(req: NextRequest) {
 
         if(pathname.startsWith('/inicio') || pathname.startsWith('/roles')){
             const validRolesPrefix = 'Admin';
-            
             if(session.user && session.user.roles){
                 const userRoles = session.user.roles as RolesListaNombres[];
                 const hasValidRole = userRoles.some((role) => role.startsWith(validRolesPrefix));

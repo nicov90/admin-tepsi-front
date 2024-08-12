@@ -12,6 +12,8 @@ import { Badge } from "@/components/ui/badge";
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 import { SessionWithUser } from '@/interfaces/session';
+import Image from 'next/image';
+import Microsoft from '@/public/microsoft-icon.svg';
 
 type FormData = {
   email: string;
@@ -140,12 +142,10 @@ const LoginUI = ({enableCustomLogin}: {enableCustomLogin: boolean}) => {
                 )}
                 <Button
                   onClick={onLoginMicrosoft}
-                  className="flex justify-center items-center gap-2 mt-1"
-                  variant="default"
+                  className="bg-sky-800 hover:bg-sky-900 flex justify-center items-center gap-2 mt-1"
                   size="lg"
-                  // startIcon={<Microsoft sx={{ mr: 1 }}/>}
                 >
-                  {/* <Microsoft sx={{ mr: 1 }}/> */}
+                  <Image src={Microsoft} className='' alt="microsoft" width={24} height={24} />
                   <p className="font-semibold">Ingresar con Microsoft</p>
                 </Button>
               </div>
