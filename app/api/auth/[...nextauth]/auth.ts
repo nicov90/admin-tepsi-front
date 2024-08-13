@@ -8,7 +8,7 @@ import { getUsuarioByEmail, registerUsuario } from '@/database/dbUsuarios';
 import { authApi } from "@/apiAxios/authApi";
 import dayjs from "dayjs";
 import { jwtDecode } from 'jwt-decode';
-import getProfilePhoto from "@/utils/azureAD";
+import { refreshAccessToken } from "@/utils/azureAD";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -71,28 +71,31 @@ export const authOptions: AuthOptions = {
         nombre: profile.name,
         email: profile.email,
       })},
+      authorization: {
+        params: {
+          scope: 'openid profile email offline_access User.Read',
+        }
+      }
     }),
   ],
 
   callbacks: {
-    async jwt({ token, account, user }) { // Devuelve el token al navegador
+    async jwt({ token, account, user }: any) { // Devuelve el token al navegador
       // console.log('JWT Callback - Admin:', { token, account, user });
+
       if ( account ) {
         token.accessToken = account.access_token;
+        token.refreshToken = account.refresh_token;
+        token.accessTokenExpires = Date.now() + account.expires_at! * 1000;
         token.provider = account.provider;
         token.user = user;
-        token.image = null;
-
-        // if(account.provider === 'azure-ad'){
-        //   try {
-        //     const photo = await getProfilePhoto(account.access_token!);
-        //     token.image = photo;
-        //   } catch (error) {
-        //     console.error('Error al obtener la imagen de perfil:', error);
-        //   }
-        // }
       }
-      return token;
+
+      if (token.accessTokenExpires && token.accessTokenExpires < Date.now() ) {
+        return refreshAccessToken(token);
+      }else{
+        return token;
+      }
     },
     async session({ session, token }: any){  // reemplaza los valores del token en la sesion
       // console.log('Session Callback - Admin:', { session, token });
@@ -104,7 +107,6 @@ export const authOptions: AuthOptions = {
       token.callbackUrl = callbackUrl as string;
       session.user = tokenUser as any || token;
       session.callbackUrl = callbackUrl as string;
-      session.image = token.image as string;
 
       const dbUser: IUsuario = await getUsuarioByEmail(session.user.email as string);
       session.user.roles = dbUser?.roles || [];
@@ -135,8 +137,6 @@ export const authOptions: AuthOptions = {
           }
         }
 
-        // const photo = await getProfilePhoto(session.access_token!);
-        // session.user.image = photo;
       }
       
       return session;

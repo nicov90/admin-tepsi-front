@@ -1,5 +1,5 @@
 import { SessionWithUser } from "@/interfaces/session";
-import getProfilePhoto from "@/utils/azureAD";
+import { getProfilePhoto } from "@/utils/azureAD";
 import { useSession } from "next-auth/react";
 import { useEffect, useState } from "react";
 

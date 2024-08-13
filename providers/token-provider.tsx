@@ -19,7 +19,7 @@ export default function TokenProvider({ children, ...rest }: Props) {
       const token = session?.user?.token;
       Cookies.set("token", token, { domain: domain });
     }else{
-      Cookies.remove("token");
+      Cookies.remove("token", { domain: domain });
     }
   }, [session]);
 
