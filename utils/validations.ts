@@ -30,7 +30,9 @@ export const NuevaCuentaFormSchema = z.object({
   password: z.string().optional(),
   roles: z.array(z.string()).min(1, { message: 'Debe seleccionar al menos un rol' }),
   mostrarInputPassword: z.boolean(), // Añadir este campo al esquema
-}).superRefine((data, ctx) => {
+});
+
+export const NuevaCuentaFormSchemaRefined = NuevaCuentaFormSchema.superRefine((data, ctx) => {
   if (data.mostrarInputPassword && (!data.password || data.password.length < 4)) {
     ctx.addIssue({
       code: "custom",

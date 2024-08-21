@@ -16,7 +16,7 @@ import { useForm } from 'react-hook-form'
 import { CircleHelpIcon, Info, PlusSquareIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import MultipleSelector from '../ui/select-multiple'
-import { NuevaCuentaFormSchema } from '@/utils/validations'
+import { NuevaCuentaFormSchema, NuevaCuentaFormSchemaRefined } from '@/utils/validations'
 import { SessionWithUser } from '@/interfaces/session'
 
 const CargarUsuario = () => {
@@ -33,20 +33,19 @@ const CargarUsuario = () => {
   // })
 
   
-  const form = useForm<z.infer<typeof NuevaCuentaFormSchema>>({
-    resolver: zodResolver(NuevaCuentaFormSchema),
+  const form = useForm<z.infer<typeof NuevaCuentaFormSchemaRefined>>({
+    resolver: zodResolver(NuevaCuentaFormSchemaRefined),
     defaultValues: {
       nombre: "",
       email: "",
       roles: [],
+      mostrarInputPassword: false,
     },
   })
   const { setError, clearErrors } = form;
-  const [mostrarInputPassword, setMostrarInputPassword] = useState(false);
-  
+  console.log(form.formState.errors)
   const handleOpenModal = (open: boolean) => {
     form.reset();
-    setMostrarInputPassword(false);
     setOpenModal(open)
   };
 
@@ -151,14 +150,14 @@ const CargarUsuario = () => {
               />
               {true && (
                 <div 
-                  className={`w-full ${mostrarInputPassword ? "hidden" : "flex"} gap-2 items-center cursor-pointer`}
-                  onClick={()=>setMostrarInputPassword(!mostrarInputPassword)}
+                  className={`w-full ${form.getValues().mostrarInputPassword ? "hidden" : "flex"} gap-2 items-center cursor-pointer`}
+                  onClick={()=>form.setValue('mostrarInputPassword', true)}
                 >
                   <p className="text-sm text-slate-500 dark:text-slate-400">Incluir contraseña</p>
                   <PlusSquareIcon size={15} className="text-slate-500 dark:text-slate-400"/>
                 </div>
               )}
-              {mostrarInputPassword && (
+              {form.getValues().mostrarInputPassword && (
                 <FormField
                   control={form.control}
                   name="password"
@@ -192,7 +191,7 @@ const CargarUsuario = () => {
                   control={form.control}
                   name="roles"
                   render={({ field }) => (
-                    <FormItem className='w-full'>
+                    <FormItem className='w-full flex flex-col'>
                       <FormLabel className='flex gap-1 py-1'>Roles</FormLabel>
                       <FormControl>
                         <MultipleSelector
@@ -230,7 +229,7 @@ const CargarUsuario = () => {
                           groupBy='group'
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className='!mt-0'/>
                     </FormItem>
                    
                   )}

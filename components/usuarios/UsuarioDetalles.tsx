@@ -41,7 +41,6 @@ const UsuarioDetalles = () => {
       mostrarInputPassword: false,
     },
   })
-  const [mostrarInputPassword, setMostrarInputPassword] = useState(false);
   const [permitirCambiarContraseña, setPermitirCambiarContraseña] = useState(false);
 
   async function onSubmit(values: z.infer<typeof NuevaCuentaFormSchema>) {
@@ -85,7 +84,7 @@ const UsuarioDetalles = () => {
     }
     setPermitirCambiarContraseña(false);
   }, [usuario, idUsuarioUrl]);
-  console.log(form.getValues().mostrarInputPassword)
+  
   return (
     <>
     {usuario && usuario.id === idUsuarioUrl && (
@@ -186,7 +185,7 @@ const UsuarioDetalles = () => {
                   control={form.control}
                   name="roles"
                   render={({ field }) => (
-                    <FormItem className='w-full /*relative/* flex flex-col'>
+                    <FormItem className='w-full flex flex-col'>
                       <FormLabel className='flex gap-1 py-1'>Roles</FormLabel>
                       <FormControl>
                         <MultipleSelector
