@@ -91,11 +91,13 @@ export const authOptions: AuthOptions = {
         token.user = user;
       }
 
-      if (token.accessTokenExpires && token.accessTokenExpires < Date.now() ) {
-        return refreshAccessToken(token);
-      }else{
-        return token;
-      }
+      // if (token.accessTokenExpires && token.accessTokenExpires < Date.now() ) {
+      //   return refreshAccessToken(token);
+      // }else{
+      //   return token;
+      // }
+
+      return refreshAccessToken(token);
     },
     async session({ session, token }: any){  // reemplaza los valores del token en la sesion
       // console.log('Session Callback - Admin:', { session, token });
@@ -109,7 +111,9 @@ export const authOptions: AuthOptions = {
       session.callbackUrl = callbackUrl as string;
 
       const dbUser: IUsuario = await getUsuarioByEmail(session.user.email as string);
+      dbUser?.id && (session.user.id = dbUser.id);
       session.user.roles = dbUser?.roles || [];
+      session.user.existePersonal = dbUser?.existePersonal || false;
 
       if(session.provider === 'azure-ad'){
         session.user.tipoLogin = "Microsoft";

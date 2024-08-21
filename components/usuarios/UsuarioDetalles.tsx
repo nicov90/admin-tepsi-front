@@ -38,6 +38,7 @@ const UsuarioDetalles = () => {
       nombre: usuario?.nombre,
       email: usuario?.email,
       roles: [],
+      mostrarInputPassword: false,
     },
   })
   const [mostrarInputPassword, setMostrarInputPassword] = useState(false);
@@ -76,6 +77,7 @@ const UsuarioDetalles = () => {
           email: usuario?.email,
           roles: [],
           password: usuario?.password ? templatePassword : '',
+          mostrarInputPassword: usuario?.password ? true : false,
         });
         const roles: Rol[] = await getRolesByUsuarioId(usuario.id).then((res) => res);
         form.setValue('roles', roles.map(r => r.Id));
@@ -83,7 +85,7 @@ const UsuarioDetalles = () => {
     }
     setPermitirCambiarContraseña(false);
   }, [usuario, idUsuarioUrl]);
-
+  console.log(form.getValues().mostrarInputPassword)
   return (
     <>
     {usuario && usuario.id === idUsuarioUrl && (
@@ -135,14 +137,14 @@ const UsuarioDetalles = () => {
               />
               {!usuario.password && (
                 <div 
-                  className={`w-full ${mostrarInputPassword ? "hidden" : "flex"} gap-2 items-center cursor-pointer`}
-                  onClick={()=>setMostrarInputPassword(!mostrarInputPassword)}
+                  className={`w-full ${form.getValues().mostrarInputPassword ? "hidden" : "flex"} gap-2 items-center cursor-pointer`}
+                  onClick={()=>form.setValue('mostrarInputPassword', true)}
                 >
                   <p className="text-sm text-slate-500 dark:text-slate-400">Incluir contraseña</p>
                   <PlusSquareIcon size={15} className="text-slate-500 dark:text-slate-400"/>
                 </div>
               )}
-              {(usuario.password || mostrarInputPassword) && (
+              {(usuario.password || form.getValues().mostrarInputPassword) && (
                 <FormField
                   control={form.control}
                   name="password"
@@ -160,7 +162,6 @@ const UsuarioDetalles = () => {
                             </TooltipContent>
                           </Tooltip>
                         </TooltipProvider>
-
                       </FormLabel>
                       <FormControl>
                         <Input 
@@ -185,25 +186,14 @@ const UsuarioDetalles = () => {
                   control={form.control}
                   name="roles"
                   render={({ field }) => (
-                    <FormItem className='w-full'>
+                    <FormItem className='w-full /*relative/* flex flex-col'>
                       <FormLabel className='flex gap-1 py-1'>Roles</FormLabel>
                       <FormControl>
                         <MultipleSelector
-                          // value={form.getValues().roles.map((rolSeleccionado) => {
-                          //   const r = listaRoles.todos.find(
-                          //     (rol) => rol.Id === rolSeleccionado
-                          //   );
-                            
-                          //   return {
-                          //     value: r!.Id || '',
-                          //     label: r!.Name || ''
-                          //   };
-                          // })}
                           value={field.value.map((rolSeleccionado) => {
                             const r = listaRoles.find(
                               (rol) => rol.Id === rolSeleccionado
                             );
-                  
                             return {
                               value: r?.Id || '',
                               label: r?.Name + ' - ' + r?.Modulo || '',
@@ -223,9 +213,8 @@ const UsuarioDetalles = () => {
                           groupBy='group'
                         />
                       </FormControl>
-                      <FormMessage />
+                      <FormMessage className='!mt-0'/>
                     </FormItem>
-                   
                   )}
                 />
               )}

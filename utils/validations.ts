@@ -27,6 +27,15 @@ export const NuevaCuentaFormSchema = z.object({
   email: z.string().email({ message: 'Ingrese un email válido' }).refine(email => email.endsWith('@tepsi.com.ar'), {
     message: 'El email debe ser de dominio tepsi.com.ar'
   }),
-  password: z.string().min(4, { message: 'La contraseña debe tener al menos 4 caracteres' }).max(16, { message: 'La contraseña debe tener menos de 16 caracteres' }).optional(),
-  roles: z.array(z.string()),
-})
+  password: z.string().optional(),
+  roles: z.array(z.string()).min(1, { message: 'Debe seleccionar al menos un rol' }),
+  mostrarInputPassword: z.boolean(), // Añadir este campo al esquema
+}).superRefine((data, ctx) => {
+  if (data.mostrarInputPassword && (!data.password || data.password.length < 4)) {
+    ctx.addIssue({
+      code: "custom",
+      message: "La contraseña debe tener al menos 4 caracteres",
+      path: ["password"], // Indica en qué campo ocurrió el error
+    });
+  }
+});
