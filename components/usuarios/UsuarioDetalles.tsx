@@ -9,18 +9,20 @@ import { UsuariosRolesContext } from '@/providers/usuariosRoles-provider'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { toast } from 'sonner'
-import { updateUsuario } from '@/database/dbUsuarios'
+import { getUsuarioByEmail, updateUsuario } from '@/database/dbUsuarios'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
 import { CircleHelpIcon, PlusSquareIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 import MultipleSelector from '../ui/select-multiple'
-import { NuevaCuentaFormSchema } from '@/utils/validations'
+import { NuevaCuentaFormSchema, NuevaCuentaFormSchemaRefined } from '@/utils/validations'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { getRolesByUsuarioId } from '@/database/dbRoles'
 import { Rol } from '@/interfaces/roles'
 import { SessionWithUser } from '@/interfaces/session'
+import { getPersonalByEmail } from '@/database/dbPersonal'
+import { IPersonal } from '@/interfaces/personal'
 
 const templatePassword = 'AAAAAAAAAAAAA';
 
@@ -32,8 +34,8 @@ const UsuarioDetalles = () => {
   const idUsuarioUrl = useSearchParams().get("id");
   const usuario = listaUsuarios && listaUsuarios.find(u => u.id === idUsuarioUrl) || null;
 
-  const form = useForm<z.infer<typeof NuevaCuentaFormSchema>>({
-    resolver: zodResolver(NuevaCuentaFormSchema),
+  const form = useForm<z.infer<typeof NuevaCuentaFormSchemaRefined>>({
+    resolver: zodResolver(NuevaCuentaFormSchemaRefined),
     defaultValues: {
       nombre: usuario?.nombre,
       email: usuario?.email,
@@ -41,6 +43,7 @@ const UsuarioDetalles = () => {
       mostrarInputPassword: false,
     },
   })
+  const { setError, clearErrors } = form;
   const [permitirCambiarContraseña, setPermitirCambiarContraseña] = useState(false);
 
   async function onSubmit(values: z.infer<typeof NuevaCuentaFormSchema>) {
@@ -65,6 +68,13 @@ const UsuarioDetalles = () => {
     }catch(err){
       console.log(err);
       toast.error("Hubo un error", { style: { backgroundColor: "red", color: "white" } });
+    }
+  }
+
+  const setearNombre = async(email: string) => {
+    const persona: IPersonal = await getPersonalByEmail(email);
+    if(persona){
+      form.setValue('nombre', persona.Apellido + ' ' + persona.Nombre);
     }
   }
 
@@ -101,19 +111,6 @@ const UsuarioDetalles = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-3 flex flex-col items-center">
               <FormField
                 control={form.control}
-                name="nombre"
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel>Nombre</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Mario Gomez" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem className='w-full'>
@@ -123,12 +120,27 @@ const UsuarioDetalles = () => {
                         placeholder="example@tepsi.com.ar" 
                         {...field}
                         onChange={(e) => {
+                          clearErrors('email');
+                          form.resetField('nombre');
                           field.onChange(e);
-                          // if (NuevaCuentaFormSchema.shape.email.safeParse(e.target.value).success) {
-                          //   checkEmailExists(e.target.value);
-                          // }
+                          if (NuevaCuentaFormSchema.shape.email.safeParse(e.target.value).success) {
+                            setearNombre(e.target.value);
+                          }
                         }}
                       />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nombre"
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel>Nombre</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Gomez Mario" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

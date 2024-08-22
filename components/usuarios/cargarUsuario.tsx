@@ -18,6 +18,8 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/
 import MultipleSelector from '../ui/select-multiple'
 import { NuevaCuentaFormSchema, NuevaCuentaFormSchemaRefined } from '@/utils/validations'
 import { SessionWithUser } from '@/interfaces/session'
+import { getPersonalByEmail } from '@/database/dbPersonal'
+import { IPersonal } from '@/interfaces/personal'
 
 const CargarUsuario = () => {
   const { data: session }: any = useSession() as SessionWithUser;
@@ -43,7 +45,6 @@ const CargarUsuario = () => {
     },
   })
   const { setError, clearErrors } = form;
-  console.log(form.formState.errors)
   const handleOpenModal = (open: boolean) => {
     form.reset();
     setOpenModal(open)
@@ -51,17 +52,12 @@ const CargarUsuario = () => {
 
   const checkEmailExists = async (email: string) => {
     try {
-      // const existePersonal = (await apiAxios().get(`/personal/${email}`)).data.data;
-      // if (!existePersonal) {
-      //   setError('email', { type: 'manual', message: 'No existe personal con este email' });
-      //   return false;
-      // } 
-
-      // const existeUsuario = (await apiAxios().get(`/usuarios/${email}`)).data.data;
       const existeUsuario = await getUsuarioByEmail(email);
       if(existeUsuario) {
         setError('email', { type: 'manual', message: 'Ya existe un usuario con este email' });
         return false;
+      }else{
+        setearNombre(email);
       }
 
       clearErrors('email');
@@ -71,6 +67,13 @@ const CargarUsuario = () => {
       return false;
     }
   };
+
+  const setearNombre = async(email: string) => {
+    const persona: IPersonal = await getPersonalByEmail(email);
+    if(persona){
+      form.setValue('nombre', persona.Apellido + ' ' + persona.Nombre);
+    }
+  }
 
   async function onSubmit(values: z.infer<typeof NuevaCuentaFormSchema>) {
     const formattedValues: IUsuarioNuevo = {
@@ -115,19 +118,6 @@ const CargarUsuario = () => {
             <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-3 flex flex-col items-center">
               <FormField
                 control={form.control}
-                name="nombre"
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel>Nombre</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Mario Gomez" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
                 name="email"
                 render={({ field }) => (
                   <FormItem className='w-full'>
@@ -137,12 +127,27 @@ const CargarUsuario = () => {
                         placeholder="example@tepsi.com.ar" 
                         {...field}
                         onChange={(e) => {
+                          clearErrors('email');
+                          form.resetField('nombre');
                           field.onChange(e);
                           if (NuevaCuentaFormSchema.shape.email.safeParse(e.target.value).success) {
                             checkEmailExists(e.target.value);
                           }
                         }}
                       />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="nombre"
+                render={({ field }) => (
+                  <FormItem className='w-full'>
+                    <FormLabel>Nombre</FormLabel>
+                    <FormControl>
+                      <Input placeholder="Gomez Mario" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
