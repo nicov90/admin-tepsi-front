@@ -41,7 +41,7 @@ export const authApi = (token?: string, ignoreToken = false) => {
   return axiosInstance;
 };
 
-const waitForToken = async (maxRetries = 5, interval = 1000) => {
+const waitForToken = async (maxRetries = 20, interval = 1000) => {
   let retries = 0;
   while (retries < maxRetries) {
     const token = Cookies.get("token");
