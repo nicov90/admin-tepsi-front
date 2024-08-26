@@ -16,42 +16,48 @@ export async function getProfilePhoto(accessToken: string) {
 }
 
 export async function refreshAccessToken(token: any) {
-  try {
-    const url =
-      `https://login.microsoftonline.com/${process.env.AZURE_AD_TENANT_ID}/oauth2/v2.0/token`;
+  if(token.provider !== 'credentials'){
 
-    const response = await fetch(url, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-      },
-      body: new URLSearchParams({
-        client_id: process.env.AZURE_AD_CLIENT_ID!,
-        client_secret: process.env.AZURE_AD_CLIENT_SECRET!,
-        grant_type: 'refresh_token',
-        refresh_token: token.refreshToken,
-        scope: 'openid profile email offline_access User.Read',
-      }),
-    });
-
-    const refreshedTokens = await response.json();
-
-    if (!response.ok) {
-      throw refreshedTokens;
+    try {
+      const url =
+        `https://login.microsoftonline.com/${process.env.AZURE_AD_TENANT_ID}/oauth2/v2.0/token`;
+  
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          client_id: process.env.AZURE_AD_CLIENT_ID!,
+          client_secret: process.env.AZURE_AD_CLIENT_SECRET!,
+          grant_type: 'refresh_token',
+          refresh_token: token.refreshToken,
+          scope: 'openid profile email offline_access User.Read',
+        }),
+      });
+  
+      const refreshedTokens = await response.json();
+  
+      if (!response.ok) {
+        throw refreshedTokens;
+      }
+  
+      return {
+        ...token,
+        accessToken: refreshedTokens.access_token,
+        accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
+        refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Reemplazamos si hay uno nuevo, sino, mantenemos el viejo
+      };
+    } catch (error) {
+      console.error('Error refreshing access token:', error);
+      
+      return {
+        ...token,
+        error: 'RefreshAccessTokenError',
+      };
     }
 
-    return {
-      ...token,
-      accessToken: refreshedTokens.access_token,
-      accessTokenExpires: Date.now() + refreshedTokens.expires_in * 1000,
-      refreshToken: refreshedTokens.refresh_token ?? token.refreshToken, // Reemplazamos si hay uno nuevo, sino, mantenemos el viejo
-    };
-  } catch (error) {
-    console.error('Error refreshing access token:', error);
-
-    return {
-      ...token,
-      error: 'RefreshAccessTokenError',
-    };
   }
+  
+  return token;
 }
