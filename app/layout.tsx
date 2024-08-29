@@ -34,7 +34,7 @@ export default function RootLayout({
                   <NextTopLoader color="rgb(0, 100, 200)" height={4}/>
                 </Suspense>
                 <Toaster />
-                <main className="px-4 w-full mx-auto">
+                <main className="w-full mx-auto">
                   <div className="flex gap-x-7">
                       {/* <div className="w-64 shrink-0 hidden md:block">
                           <Sidebar />
