@@ -4,12 +4,12 @@ import { Button } from '../ui/button'
 import { DialogContent, DialogDescription, DialogTitle } from '../ui/dialog'
 import { startCase } from 'lodash'
 import { useSession } from 'next-auth/react'
-import { IUsuarioNuevo, IUsuarioUpdate } from '@/interfaces/usuarios'
+import { IUsuarioUpdate } from '@/interfaces/usuarios'
 import { UsuariosRolesContext } from '@/providers/usuariosRoles-provider'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '../ui/form'
 import { Input } from '../ui/input'
 import { toast } from 'sonner'
-import { getUsuarioByEmail, updateUsuario } from '@/database/dbUsuarios'
+import { updateUsuario } from '@/database/dbUsuarios'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm } from 'react-hook-form'
@@ -43,7 +43,7 @@ const UsuarioDetalles = () => {
       mostrarInputPassword: false,
     },
   })
-  const { setError, clearErrors } = form;
+  const { clearErrors } = form;
   const [permitirCambiarContraseña, setPermitirCambiarContraseña] = useState(false);
 
   async function onSubmit(values: z.infer<typeof NuevaCuentaFormSchema>) {
@@ -93,7 +93,8 @@ const UsuarioDetalles = () => {
       })()
     }
     setPermitirCambiarContraseña(false);
-  }, [usuario, idUsuarioUrl]);
+  }, [usuario, idUsuarioUrl, form]);
+  console.log(form.getValues('mostrarInputPassword'));
   
   return (
     <>
@@ -146,16 +147,7 @@ const UsuarioDetalles = () => {
                   </FormItem>
                 )}
               />
-              {!usuario.password && (
-                <div 
-                  className={`w-full ${form.getValues().mostrarInputPassword ? "hidden" : "flex"} gap-2 items-center cursor-pointer`}
-                  onClick={()=>form.setValue('mostrarInputPassword', true)}
-                >
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Incluir contraseña</p>
-                  <PlusSquareIcon size={15} className="text-slate-500 dark:text-slate-400"/>
-                </div>
-              )}
-              {(usuario.password || form.getValues().mostrarInputPassword) && (
+              {(usuario.password || form.watch('mostrarInputPassword')) ? (
                 <FormField
                   control={form.control}
                   name="password"
@@ -191,6 +183,14 @@ const UsuarioDetalles = () => {
                     </FormItem>
                   )}
                 />
+              ) : (
+                <div 
+                  className={`w-full ${form.getValues().mostrarInputPassword ? "hidden" : "flex"} gap-2 items-center cursor-pointer`}
+                  onClick={()=>form.setValue('mostrarInputPassword', true)}
+                >
+                  <p className="text-sm text-slate-500 dark:text-slate-400">Incluir contraseña</p>
+                  <PlusSquareIcon size={15} className="text-slate-500 dark:text-slate-400"/>
+                </div>
               )}
               {listaRoles && (
                 <FormField
@@ -205,17 +205,20 @@ const UsuarioDetalles = () => {
                             const r = listaRoles.find(
                               (rol) => rol.Id === rolSeleccionado
                             );
+                  
                             return {
-                              value: r?.Id || '',
+                              id: r?.Id || '',
+                              value: r?.Name + ' - ' + r?.Modulo || '',
                               label: r?.Name + ' - ' + r?.Modulo || '',
                               group: r?.Modulo || 'Otros'
                             };
                           })}
                           onChange={(selectedOptions) => {
-                            field.onChange(selectedOptions.map(option => option.value));
+                            field.onChange(selectedOptions.map(option => option.id));
                           }}
                           options={listaRoles.map((rol) => ({
-                            value: rol.Id,
+                            id: rol.Id || '',
+                            value: rol.Name + ' - ' + rol.Modulo || '',
                             label: rol.Name,
                             group: rol.Modulo || 'Otros'
                           }))}

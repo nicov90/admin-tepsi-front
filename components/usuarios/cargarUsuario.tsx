@@ -26,14 +26,6 @@ const CargarUsuario = () => {
   const { refreshUsuarios, listaRoles } = useContext(UsuariosRolesContext);
 
   const [openModal, setOpenModal] = useState(false);
-  // const [nuevoUsuario, setNuevoUsuario] = useState<IUsuarioNuevo>({
-  //   nombre: '',
-  //   email: '',
-  //   password: '',
-  //   roles: [],
-  //   cargadoPor: ''
-  // })
-
   
   const form = useForm<z.infer<typeof NuevaCuentaFormSchemaRefined>>({
     resolver: zodResolver(NuevaCuentaFormSchemaRefined),
@@ -100,181 +92,142 @@ const CargarUsuario = () => {
   }
 
   return (
-    <>
-      <Dialog open={openModal} onOpenChange={open => handleOpenModal(open)}>
+    <Dialog open={openModal} onOpenChange={open => handleOpenModal(open)}>
         <DialogTrigger asChild className='cursor-pointer mr-3'>
           <Button variant="default" className='max-w-[200px] px-5' size="sm">Crear</Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[460px] py-10">
-        <div
-          id="user_add"
-          className="flex flex-col gap-1 my-1 mx-5"
-        >
-          <DialogDescription className='hidden'></DialogDescription>
-          <DialogTitle className='w-full'>
-            <p className="mb-5 text-start text-xl font-bold">Crear nuevo usuario</p>
-          </DialogTitle>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-3 flex flex-col items-center">
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel>Email</FormLabel>
-                    <FormControl>
-                      <Input 
-                        placeholder="example@tepsi.com.ar" 
-                        {...field}
-                        onChange={(e) => {
-                          clearErrors('email');
-                          form.resetField('nombre');
-                          field.onChange(e);
-                          if (NuevaCuentaFormSchema.shape.email.safeParse(e.target.value).success) {
-                            checkEmailExists(e.target.value);
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="nombre"
-                render={({ field }) => (
-                  <FormItem className='w-full'>
-                    <FormLabel>Nombre</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Gomez Mario" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              {true && (
-                <div 
-                  className={`w-full ${form.getValues().mostrarInputPassword ? "hidden" : "flex"} gap-2 items-center cursor-pointer`}
-                  onClick={()=>form.setValue('mostrarInputPassword', true)}
-                >
-                  <p className="text-sm text-slate-500 dark:text-slate-400">Incluir contraseña</p>
-                  <PlusSquareIcon size={15} className="text-slate-500 dark:text-slate-400"/>
-                </div>
-              )}
-              {form.getValues().mostrarInputPassword && (
+          <div
+            id="user_add"
+            className="flex flex-col gap-1 my-1 mx-5"
+          >
+            <DialogDescription className='hidden'></DialogDescription>
+            <DialogTitle className='w-full'>
+              <p className="mb-5 text-start text-xl font-bold">Crear nuevo usuario</p>
+            </DialogTitle>
+            <Form {...form}>
+              <form onSubmit={form.handleSubmit(onSubmit)} className="w-full space-y-3 flex flex-col items-center">
                 <FormField
                   control={form.control}
-                  name="password"
+                  name="email"
                   render={({ field }) => (
                     <FormItem className='w-full'>
-                      <FormLabel className='flex gap-1 py-1.5'>
-                        Contraseña
-                        <p className="text-xs text-slate-500 dark:text-slate-400">(opcional)</p>
-                        <TooltipProvider>
-                          <Tooltip>
-                            <TooltipTrigger onClick={(e) => e.preventDefault()}>
-                              <CircleHelpIcon size={15} className="text-slate-800 dark:text-slate-400" />
-                            </TooltipTrigger>
-                            <TooltipContent className='w-svw max-w-[380px]'>
-                              <p>Esta es la contraseña con la que el usuario puede iniciar sesión si no se ingresa con Microsoft.</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-
-                      </FormLabel>
+                      <FormLabel>Email</FormLabel>
                       <FormControl>
-                        <Input type="password" placeholder="********" {...field} />
+                        <Input 
+                          placeholder="example@tepsi.com.ar" 
+                          {...field}
+                          onChange={(e) => {
+                            clearErrors('email');
+                            form.resetField('nombre');
+                            field.onChange(e);
+                            if (NuevaCuentaFormSchema.shape.email.safeParse(e.target.value).success) {
+                              checkEmailExists(e.target.value);
+                            }
+                          }}
+                        />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-              )}
-              {listaRoles && (
                 <FormField
                   control={form.control}
-                  name="roles"
+                  name="nombre"
                   render={({ field }) => (
-                    <FormItem className='w-full flex flex-col'>
-                      <FormLabel className='flex gap-1 py-1'>Roles</FormLabel>
+                    <FormItem className='w-full'>
+                      <FormLabel>Nombre</FormLabel>
                       <FormControl>
-                        <MultipleSelector
-                          // value={form.getValues().roles.map((rolSeleccionado) => {
-                          //   const r = listaRoles.find(
-                          //     (rol) => rol.Id === rolSeleccionado
-                          //   );
-                            
-                          //   return {
-                          //     value: r!.Id || '',
-                          //     label: r!.Name || ''
-                          //   };
-                          // })}
-                          value={field.value.map((rolSeleccionado) => {
-                            const r = listaRoles.find(
-                              (rol) => rol.Id === rolSeleccionado
-                            );
-                  
-                            return {
-                              value: r?.Id || '',
-                              label: r?.Name + ' - ' + r?.Modulo || '',
-                              group: r?.Modulo || 'Otros'
-                            };
-                          })}
-                          onChange={(selectedOptions) => {
-                            field.onChange(selectedOptions.map(option => option.value));
-                          }}
-                          options={listaRoles.map((rol) => ({
-                            value: rol.Id,
-                            label: rol.Name,
-                            group: rol.Modulo || 'Otros'
-                          }))}
-                          className="text-[13px]"
-                          placeholder="Asignar roles"
-                          groupBy='group'
-                        />
+                        <Input placeholder="Gomez Mario" {...field} />
                       </FormControl>
-                      <FormMessage className='!mt-0'/>
+                      <FormMessage />
                     </FormItem>
-                   
                   )}
                 />
-              )}
-              <Button type="submit" className='w-full' style={{ marginTop: 30 }}>Crear</Button>
-            </form>
-          </Form>
-        </div>
-          {/* <DialogHeader className='mb-3'>
-            <DialogTitle>Crear nuevo usuario</DialogTitle>
-          </DialogHeader> */}
-          {/* <div className="flex flex-col gap-2">
-            <div className='flex items-center gap-2'>
-              <Label htmlFor="usuario" className="text-center min-w-16">
-                Usuario
-              </Label>
-              <Select
-                name="usuario"
-                onValueChange={(value) => setNuevoUsuario({ ...nuevoUsuario, IdUsuario: value })}
-              >
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Seleccionar"/>
-                </SelectTrigger>
-                <SelectContent>
-                  {listaUsuarios.map((usuario) => (
-                    <SelectItem key={usuario.Id} value={usuario.Id}>
-                      {startCase(usuario.Nombre)}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </div> */}
-          {/* <DialogFooter>
-            <Button type="submit" onClick={cargarUsuario}>Cargar</Button>
-          </DialogFooter> */}
+                {form.watch('mostrarInputPassword') ? (
+                  <FormField
+                    control={form.control}
+                    name="password"
+                    render={({ field }) => (
+                      <FormItem className='w-full'>
+                        <FormLabel className='flex gap-1 py-1.5'>
+                          Contraseña
+                          <p className="text-xs text-slate-500 dark:text-slate-400">(opcional)</p>
+                          <TooltipProvider>
+                            <Tooltip>
+                              <TooltipTrigger onClick={(e) => e.preventDefault()}>
+                                <CircleHelpIcon size={15} className="text-slate-800 dark:text-slate-400" />
+                              </TooltipTrigger>
+                              <TooltipContent className='w-svw max-w-[380px]'>
+                                <p>Esta es la contraseña con la que el usuario puede iniciar sesión si no se ingresa con Microsoft.</p>
+                              </TooltipContent>
+                            </Tooltip>
+                          </TooltipProvider>
+
+                        </FormLabel>
+                        <FormControl>
+                          <Input type="password" placeholder="********" {...field} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                ) : (
+                  <div 
+                    className={`w-full ${form.getValues().mostrarInputPassword ? "hidden" : "flex"} gap-2 items-center cursor-pointer`}
+                    onClick={()=>form.setValue('mostrarInputPassword', true)}
+                  >
+                    <p className="text-sm text-slate-500 dark:text-slate-400">Incluir contraseña</p>
+                    <PlusSquareIcon size={15} className="text-slate-500 dark:text-slate-400"/>
+                  </div>
+                )}
+                {listaRoles && (
+                  <FormField
+                    control={form.control}
+                    name="roles"
+                    render={({ field }) => (
+                      <FormItem className='w-full flex flex-col'>
+                        <FormLabel className='flex gap-1 py-1'>Roles</FormLabel>
+                        <FormControl>
+                          <MultipleSelector
+                            value={field.value.map((rolSeleccionado) => {
+                              const r = listaRoles.find(
+                                (rol) => rol.Id === rolSeleccionado
+                              );
+                    
+                              return {
+                                id: r?.Id || '',
+                                value: r?.Name + ' - ' + r?.Modulo || '',
+                                label: r?.Name + ' - ' + r?.Modulo || '',
+                                group: r?.Modulo || 'Otros'
+                              };
+                            })}
+                            onChange={(selectedOptions) => {
+                              field.onChange(selectedOptions.map(option => option.id));
+                            }}
+                            options={listaRoles.map((rol) => ({
+                              id: rol.Id || '',
+                              value: rol.Name + ' - ' + rol.Modulo || '',
+                              label: rol.Name,
+                              group: rol.Modulo || 'Otros'
+                            }))}
+                            className="text-[13px]"
+                            placeholder="Asignar roles"
+                            groupBy='group'
+                          />
+                        </FormControl>
+                        <FormMessage className='!mt-0'/>
+                      </FormItem>
+                    
+                    )}
+                  />
+                )}
+                <Button type="submit" className='w-full' style={{ marginTop: 30 }}>Crear</Button>
+              </form>
+            </Form>
+          </div>
         </DialogContent>
       </Dialog>
-    </>
   )
 }
 

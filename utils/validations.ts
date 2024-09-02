@@ -23,7 +23,7 @@ export const userSchema = Yup.object({
 })
 
 export const NuevaCuentaFormSchema = z.object({
-  nombre: z.string().min(3, { message: 'El nombre es requerido' }).regex(/^\S+\s+\S+$/, { message: 'Debe escribir nombre y apellido' }),
+  nombre: z.string().min(3, { message: 'El nombre es requerido' }),
   email: z.string().email({ message: 'Ingrese un email válido' }).refine(email => email.endsWith('@tepsi.com.ar'), {
     message: 'El email debe ser de dominio tepsi.com.ar'
   }),
