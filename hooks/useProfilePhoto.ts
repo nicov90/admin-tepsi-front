@@ -26,7 +26,7 @@ const useProfilePhoto = () => {
         setImage(defaultAvatarUrl);
       }
     }
-  }, [session?.accessToken]);
+  }, [session]);
 
   return image;
 }
