@@ -14,6 +14,7 @@ import { UsuariosRolesContext } from '@/providers/usuariosRoles-provider'
 import UsuarioDetalles from '../usuarios/UsuarioDetalles'
 import RolDetalles from '../roles/RolDetalles'
 import { SessionWithUser } from '@/interfaces/session'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 
 interface Props{
   row: any
@@ -23,8 +24,7 @@ interface Props{
 const TableItemDropdown = ({ row, nombreTabla }: Props) => {
   const { push } = useRouter();
   const { data: session } = useSession() as SessionWithUser;
-  const { refreshUsuarios } = useContext(UsuariosRolesContext);
-  const { refreshRoles } = useContext(UsuariosRolesContext);
+  const { refreshUsuarios, refreshRoles } = useContext(UsuariosRolesContext);
   const searchParams = useSearchParams();
   const pathname = usePathname();
   const detallesRef = useRef<HTMLDivElement | null>(null);
@@ -32,42 +32,48 @@ const TableItemDropdown = ({ row, nombreTabla }: Props) => {
   const id = searchParams.get("id")
   const [openEliminarModal, setOpenEliminarModal] = useState(false);
   const rowData = row.original;
+  const esUsuarioActual = rowData.email === session?.user?.email
+  const usuarioActualEsAdminGeneral = session?.user?.roles?.includes("Admin - GENERAL");
+  const filaUsuarioEsAdminGeneral = nombreTabla === 'usuarios' && rowData.roles.includes("Admin - GENERAL");
+  const deshabilitarModificacion = !usuarioActualEsAdminGeneral && filaUsuarioEsAdminGeneral;
 
   const handleEliminar = async() => {
     switch (nombreTabla) {
       case 'usuarios':
-        try{
-          if(rowData.email === session?.user?.email){
-            toast.error('No puedes eliminarte a ti mismo.', { style: { backgroundColor: "red", color: "white" } }); 
-            return;
+          if(!deshabilitarModificacion){
+            try{
+              if(esUsuarioActual){
+                toast.error('No puedes eliminarte a ti mismo.', { style: { backgroundColor: "red", color: "white" } }); 
+                return;
+              }
+              deleteUsuario(rowData.email);
+              toast.success('Usuario eliminado con exito.', { style: { backgroundColor: "green", color: "white" } });
+              
+              refreshUsuarios();
+            }catch(err){
+              console.log(err);
+              toast.error('Hubo un error', { style: { backgroundColor: "red", color: "white" } });
+            }
           }
-          deleteUsuario(rowData.email);
-          toast.success('Usuario eliminado con exito.', { style: { backgroundColor: "green", color: "white" } });
-          
-          refreshUsuarios();
-        }catch(err){
-          console.log(err);
-          toast.error('Hubo un error', { style: { backgroundColor: "red", color: "white" } });
-        }
         break;
 
       case 'roles':
-
-        if(rowData.Modulo == 'GENERAL' && rowData.Name == 'Admin'){
-          toast.error('Este rol no se puede eliminar.', { style: { backgroundColor: "red", color: "white" } });
-          return;
-        }
-        try{
-          await deleteRole(rowData.Id);
-          toast.success('Rol eliminado con exito.', { style: { backgroundColor: "green", color: "white" } });
-
-          refreshRoles();
-        }catch(err: any){
-          console.log(err);
-          const errMsj = err.response?.data?.mensaje;
-          toast.error(`${errMsj ? `${errMsj}` : 'Ha ocurrido un error'}`, { style: { backgroundColor: "red", color: "white" } });
-        }
-
+          if(!deshabilitarModificacion){
+            if(rowData.Modulo == 'GENERAL' && rowData.Name == 'Admin'){
+              toast.error('Este rol no se puede eliminar.', { style: { backgroundColor: "red", color: "white" } });
+              return;
+            }
+            try{
+              await deleteRole(rowData.Id);
+              toast.success('Rol eliminado con exito.', { style: { backgroundColor: "green", color: "white" } });
+    
+              refreshRoles();
+            }catch(err: any){
+              console.log(err);
+              const errMsj = err.response?.data?.mensaje;
+              toast.error(`${errMsj ? `${errMsj}` : 'Ha ocurrido un error'}`, { style: { backgroundColor: "red", color: "white" } });
+            }
+          }
         break;
 
       default:
@@ -86,19 +92,60 @@ const TableItemDropdown = ({ row, nombreTabla }: Props) => {
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Acciones</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => push(`${pathname}?id=${nombreTabla === 'usuarios' ? rowData.id : rowData.Id}`)}
-          >
-            Editar
-            {/* {nombreTabla === 'usuarios' && 'Editar'}
-            {nombreTabla === 'roles' && 'Modificar'} */}
-          </DropdownMenuItem>
-          <DropdownMenuItem 
-            onClick={() => eliminarRef.current?.click()} 
-            className='font-medium text-red-700 focus:text-red-900'
-          >
-            Eliminar
-          </DropdownMenuItem>  
+          {deshabilitarModificacion ? (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className='w-full cursor-default'>
+                  <DropdownMenuItem
+                    onClick={() => push(`${pathname}?id=${nombreTabla === 'usuarios' ? rowData.id : rowData.Id}`)}
+                    disabled={deshabilitarModificacion}
+                  >
+                    Editar
+                  </DropdownMenuItem>
+                </TooltipTrigger>
+                <TooltipContent 
+                    side='bottom'
+                    className={`w-40 bg-gray-800 text-white p-2 rounded-md shadow-lg text-xs text-pretty text-center`}
+                  >
+                  {`No puedes modificar a un usuario con rol Admin - GENERAL`}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            <DropdownMenuItem
+              onClick={() => push(`${pathname}?id=${nombreTabla === 'usuarios' ? rowData.id : rowData.Id}`)}
+            >
+              Editar
+            </DropdownMenuItem>
+          )}
+          {deshabilitarModificacion ? (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger className='w-full cursor-default'>
+                  <DropdownMenuItem 
+                    onClick={() => eliminarRef.current?.click()} 
+                    className='font-medium text-red-700 focus:text-red-900'
+                    disabled={deshabilitarModificacion}
+                  >
+                    Eliminar
+                  </DropdownMenuItem>
+                </TooltipTrigger>
+                <TooltipContent 
+                    side='bottom'
+                    className={`w-40 bg-gray-800 text-white p-2 rounded-md shadow-lg text-xs text-pretty text-center`}
+                  >
+                  {`No puedes modificar a un usuario con rol Admin - GENERAL`}
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          ) : (
+            <DropdownMenuItem 
+              onClick={() => eliminarRef.current?.click()} 
+              className='font-medium text-red-700 focus:text-red-900'
+            >
+              Eliminar
+            </DropdownMenuItem>
+          )}
         </DropdownMenuContent>
       </DropdownMenu>
       <Dialog open={!!id} onOpenChange={() => push(pathname)}>

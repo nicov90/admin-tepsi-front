@@ -101,9 +101,9 @@ export const authOptions: AuthOptions = {
     },
     async session({ session, token }: any){  // reemplaza los valores del token en la sesion
       // console.log('Session Callback - Admin:', { session, token });
-
       session.accessToken = token.accessToken as string;
       session.provider = token.provider as string;
+
       const { callbackUrl = '/', ...tokenUser } = token.user;
       token.user = tokenUser as any;
       token.callbackUrl = callbackUrl as string;
@@ -111,36 +111,16 @@ export const authOptions: AuthOptions = {
       session.callbackUrl = callbackUrl as string;
 
       const dbUser: IUsuario = await getUsuarioByEmail(session.user.email as string);
-      dbUser?.id && (session.user.id = dbUser.id);
-      session.user.roles = dbUser?.roles || [];
-      session.user.existePersonal = dbUser?.existePersonal || false;
+      if (dbUser) {
+        session.user.id = dbUser.id;
+        session.user.roles = dbUser.roles || [];
+        session.user.existePersonal = dbUser.existePersonal || false;
+      }
 
       if(session.provider === 'azure-ad'){
         session.user.tipoLogin = "Microsoft";
 
-        let tokenExpired = false;
-        if (session.user.token) {
-          try {
-              const decodedToken = jwtDecode(session.user.token);
-              const expirationTime = dayjs.unix(decodedToken.exp!);
-              tokenExpired = dayjs().isAfter(expirationTime);
-          } catch (error) {
-              console.error("Error decoding token:", error);
-              tokenExpired = true;
-          }
-        }
-
-        if (!session.user.token || tokenExpired) {
-          try {
-            const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
-              azureToken: session.accessToken,
-            })).data.token;
-            session.user.token = newToken;
-          } catch (error) {
-            console.error("Error refreshing token:", error);
-          }
-        }
-
+        await handleAzureAdToken(session);
       }
       
       return session;
@@ -196,16 +176,14 @@ export const authOptions: AuthOptions = {
 
   events: {
     async signIn({ user, account, profile }) {
-      const userName = (user?.name || profile?.name)?.split(" ").map((word) => capitalize(word.toLowerCase())).join(" ")!;
+      const userName = (user?.name || profile?.name)?.split(" ").map((word) => word.toUpperCase()).join(" ")!;
       const userEmail = user?.email || profile?.email;
-
       if(account?.provider === 'azure-ad' && userEmail){
         try{
           const newToken = (await authApi(undefined, true).post(`/Auth/ValidarTokenAzure`, {
             azureToken: account?.access_token,
           })).data.token;
-          
-          // res.setHeader('Set-Cookie', `token=${newToken};path=/`);
+
           await registerUsuario({
             email: userEmail,
             nombre: userName,
@@ -280,5 +258,33 @@ export const authOptions: AuthOptions = {
         domain: process.env.NODE_ENV === 'production' ? '.grupotepsi.com' : 'localhost'
       },
     },
+  }
+}
+
+const handleAzureAdToken = async (session: any) => {
+  const tokenExpired = isTokenExpired(session.user?.token);
+
+  if (!session.user.token || tokenExpired) {
+    try {
+      const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
+        azureToken: session.accessToken,
+      })).data.token;
+      session.user.token = newToken;
+    } catch (error) {
+      console.error("Error refreshing token:", error);
+    }
+  }
+}
+
+function isTokenExpired(token: string | undefined): boolean {
+  if (!token) return true;
+
+  try {
+    const decodedToken = jwtDecode(token);
+    const expirationTime = dayjs.unix(decodedToken.exp!);
+    return dayjs().isAfter(expirationTime);
+  } catch (error) {
+    console.error("Error decoding token:", error);
+    return true;
   }
 }

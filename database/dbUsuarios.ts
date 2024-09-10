@@ -19,7 +19,6 @@ export async function getUsuarioByEmail(email: string): Promise<any> {
   
     return usuario;
   }catch(err){
-    console.log(err)
     return null;
   }
 }
