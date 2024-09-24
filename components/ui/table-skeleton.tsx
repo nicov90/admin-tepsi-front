@@ -3,6 +3,7 @@ import ContentLoader, { IContentLoaderProps } from "react-content-loader"
 
 const TableSkeleton = (props: IContentLoaderProps) => (
   <ContentLoader
+    uniqueKey="table-skeleton"
     className="animate-pulse py-4"
     speed={2}
     width={"100%"}

@@ -94,7 +94,6 @@ const UsuarioDetalles = () => {
     }
     setPermitirCambiarContraseña(false);
   }, [usuario, idUsuarioUrl, form]);
-  console.log(form.getValues('mostrarInputPassword'));
   
   return (
     <>

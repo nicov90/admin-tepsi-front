@@ -9,7 +9,7 @@ export async function middleware(req: NextRequest) {
     const pathname = req.nextUrl.pathname;
 
     if (!session) {
-        if(!pathname.startsWith('/api/auth')){ // ruta que consulta nextauth - necesario
+        if(!pathname.startsWith('/auth/login') && !pathname.startsWith('/api/auth')){ // ruta que consulta nextauth - necesario
             const requestedPage = req.nextUrl.pathname;
             const url = req.nextUrl.clone();
             url.pathname = `/auth/login`;
@@ -18,6 +18,11 @@ export async function middleware(req: NextRequest) {
             return NextResponse.redirect(url);
         }
     }else{
+        if(pathname.startsWith('/auth/login')){
+            const url = req.nextUrl.clone();
+            url.pathname = `/inicio`;
+            return NextResponse.redirect(url);
+        }
 
         if(pathname.startsWith('/inicio') || pathname.startsWith('/roles')){
             const validRolesPrefix = 'Admin';
@@ -41,6 +46,7 @@ export async function middleware(req: NextRequest) {
 
 export const config = {
     matcher: [
+        '/auth/login',
         '/inicio',
         '/roles',
         '/api/:path*',

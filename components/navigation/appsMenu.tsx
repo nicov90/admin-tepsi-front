@@ -122,7 +122,7 @@ const AppsMenu = ({ className, position = 'left' }: Props) => {
                 {/* Renderiza las siluetas para llenar los espacios vacíos */}
                 {Array.from({ length: numSiluetas }).map((_, index) => (
                   <MenuItem key={`silhouette-${index}`}>
-                    <Silueta />
+                    <></>{/* <Silueta /> */}
                   </MenuItem>
                 ))}
               </div>
@@ -138,8 +138,8 @@ const AppsMenu = ({ className, position = 'left' }: Props) => {
 const Silueta = () => (
   <div className="flex flex-col items-center justify-center py-2 text-sm text-gray-300 rounded-xl">
     <div className="flex flex-col items-center justify-center py-2 w-full">
-      <div className="w-6 h-6 opacity-90 bg-gray-50 rounded-lg"></div>
-      <div className="mt-2 text-gray-100 text-xs">Vacío</div>
+      <div className="w-6 h-6 opacity-90 bg-gray-50 rounded-full"></div>
+      <div className="mt-2 w-8 h-3 bg-gray-50 rounded-sm"></div>
     </div>
   </div>
 );
