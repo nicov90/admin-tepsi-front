@@ -83,7 +83,6 @@ const LoginUI = ({enableCustomLogin}: {enableCustomLogin: boolean}) => {
         <form className='w-full max-w-[320px]' onSubmit={handleSubmit(data => handleLogin(data, "custom"))} autoComplete="off" noValidate>
           <div className='pb-6 rounded-none shadow-lg bg-white overflow-hidden'>
             <h1 className="bg-sky-950 py-2 rounded-md text-white mb-6 text-center text-base font-bold">Iniciar sesión</h1>
-            {/* <div className="my-2 h-[2px] rounded-full bg-sky-800"></div> */}
             {isLoading ? (
               <div className='flex justify-center items-center py-4'>
                 <BeatLoader color="black" size={8} speedMultiplier={0.5}/>

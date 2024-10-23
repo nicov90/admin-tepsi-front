@@ -89,13 +89,11 @@ export const authOptions: AuthOptions = {
         token.accessTokenExpires = Date.now() + account.expires_at! * 1000;
         token.provider = account.provider;
         token.user = user;
-      }
 
-      // if (token.accessTokenExpires && token.accessTokenExpires < Date.now() ) {
-      //   return refreshAccessToken(token);
-      // }else{
-      //   return token;
-      // }
+        if (token.provider === "azure-ad") {
+          await handleAzureAdToken(token);
+        }
+      }
 
       return refreshAccessToken(token);
     },
@@ -109,18 +107,13 @@ export const authOptions: AuthOptions = {
       token.callbackUrl = callbackUrl as string;
       session.user = tokenUser as any || token;
       session.callbackUrl = callbackUrl as string;
+      session.user.roles = [];
 
       const dbUser: IUsuario = await getUsuarioByEmail(session.user.email as string);
       if (dbUser) {
         session.user.id = dbUser.id;
         session.user.roles = dbUser.roles || [];
         session.user.existePersonal = dbUser.existePersonal || false;
-      }
-
-      if(session.provider === 'azure-ad'){
-        session.user.tipoLogin = "Microsoft";
-
-        await handleAzureAdToken(session);
       }
       
       return session;

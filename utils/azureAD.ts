@@ -16,7 +16,7 @@ export async function getProfilePhoto(accessToken: string) {
 }
 
 export async function refreshAccessToken(token: any) {
-  if(token.provider !== 'credentials'){
+  if(token.provider === 'azure-ad') {
 
     try {
       const url =
