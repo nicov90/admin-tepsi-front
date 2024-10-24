@@ -80,21 +80,32 @@ export const authOptions: AuthOptions = {
   ],
 
   callbacks: {
-    async jwt({ token, account, user }: any) { // Devuelve el token al navegador
+    async jwt({ token, account, user, trigger }: any) { // Devuelve el token al navegador
       // console.log('JWT Callback - Admin:', { token, account, user });
-
+      
       if ( account ) {
         token.accessToken = account.access_token;
         token.refreshToken = account.refresh_token;
         token.accessTokenExpires = Date.now() + account.expires_at! * 1000;
         token.provider = account.provider;
         token.user = user;
-
+        
         if (token.provider === "azure-ad") {
           await handleAzureAdToken(token);
         }
       }
-
+      
+      if(trigger === 'signIn'){
+        await registerUsuario({
+          email: user.email,
+          nombre: user.nombre,
+          roles: [],
+          tipoLogin: 'microsoft',
+          password: '',
+          cargadoPor: 'admin-tepsi',
+        }, token.user.token);
+      }
+      
       return refreshAccessToken(token);
     },
     async session({ session, token }: any){  // reemplaza los valores del token en la sesion
