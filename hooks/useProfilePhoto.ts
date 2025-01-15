@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 const useProfilePhoto = () => {
   const { data: session } = useSession() as SessionWithUser;
   const [image, setImage] = useState<string | null>(null);
-  const defaultAvatarUrl = 'https://tailus.io/sources/blocks/grid-cards/preview/images/avatars/third_user.webp';
+  const defaultAvatarUrl = '/profile-default.webp';
 
   useEffect(() => {
     if(session){
