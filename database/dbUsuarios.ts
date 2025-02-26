@@ -1,6 +1,7 @@
 import Cookies from "js-cookie";
 import { IUsuarioNuevo, IUsuarioUpdate } from "@/interfaces/usuarios";
 import { authApi } from "@/apiAxios/authApi";
+import { toast } from "sonner";
 
 const clientToken = Cookies.get("token");
 
@@ -19,6 +20,7 @@ export async function getUsuarioByEmail(email: string): Promise<any> {
   
     return usuario;
   }catch(err){
+    console.log(`| getUsuarioByEmail | Error al obtener usuario: ${email}`)
     return null;
   }
 }
@@ -49,8 +51,10 @@ export async function registerUsuario(body: IUsuarioNuevo, token?: string): Prom
         hasError: false
       }
     }
+    toast.success("Usuario creado", { style: { backgroundColor: "green", color: "white" } });
   }catch(err){
     console.log(err)
+    toast.error("Hubo un error", { style: { backgroundColor: "red", color: "white" } });
     // return {
     //   hasError: true,
     //   message: "Ya existe un usuario con ese email"

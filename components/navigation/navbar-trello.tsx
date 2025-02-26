@@ -4,10 +4,10 @@ import { LogoutButton } from "@/components/logout-button";
 import Image from "next/image";
 import Link from "next/link";
 import AppsMenu from "./appsMenu";
-import tepsiLogo from "@/public/tepsi-logo.webp";
 import { SeparatorVertical } from "lucide-react";
 
 export const Navbar = ({ denied = false }: { denied?: boolean }) => {
+  const rutaLogo = "/tepsi-logo-black.png";
 
   return (
     <nav className="fixed inset-x-0 top-0 h-14 border-b shadow-sm flex items-center bg-white z-50 px-3 pr-1">
@@ -17,11 +17,12 @@ export const Navbar = ({ denied = false }: { denied?: boolean }) => {
           <AppsMenu className="hidden md:block" position="left"/>
           <Link className="hidden md:flex" href="https://intranet.grupotepsi.com/" passHref>
             <Image
-              src={tepsiLogo}
+              src={rutaLogo}
               alt="Tepsi"
               width={130}
+              height={30}
               priority
-              style={{ filter: "invert(1) brightness(0)" }}
+              unoptimized // para poder servir desde public
             />
           </Link>
         </div>

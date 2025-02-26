@@ -80,15 +80,9 @@ const CargarUsuario = () => {
       return;
     }
     
-    try{
-      await registerUsuario(formattedValues);
-      refreshUsuarios();
-      toast.success("Usuario creado", { style: { backgroundColor: "green", color: "white" } });
-      handleOpenModal(false);
-    }catch(err){
-      console.log(err);
-      toast.error("Hubo un error", { style: { backgroundColor: "red", color: "white" } });
-    }
+    await registerUsuario(formattedValues);
+    refreshUsuarios();
+    handleOpenModal(false);
   }
 
   return (
