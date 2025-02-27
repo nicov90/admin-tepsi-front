@@ -51,10 +51,16 @@ export async function registerUsuario(body: IUsuarioNuevo, token?: string): Prom
         hasError: false
       }
     }
-    toast.success("Usuario creado", { style: { backgroundColor: "green", color: "white" } });
+    
+    if (typeof window !== "undefined") {
+      toast.success("Usuario creado", { style: { backgroundColor: "green", color: "white" } });
+    }
+
   }catch(err){
     console.log(err)
-    toast.error("Hubo un error", { style: { backgroundColor: "red", color: "white" } });
+    if (typeof window !== "undefined") {
+      toast.error("Hubo un error", { style: { backgroundColor: "red", color: "white" } });
+    }
     // return {
     //   hasError: true,
     //   message: "Ya existe un usuario con ese email"
