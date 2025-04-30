@@ -3,6 +3,7 @@
 import {
   ColumnDef,
   ColumnFiltersState,
+  FilterFn,
   SortingState,
   flexRender,
   getCoreRowModel,
@@ -25,6 +26,35 @@ import { useState } from "react"
 import { Search } from "lucide-react"
 import { Input } from "./input"
 import { useWindowSize } from "@/hooks/useWindowSize"
+// A TanStack fork of Kent C. Dodds' match-sorter library that provides ranking information
+import {
+  RankingInfo,
+  rankItem,
+} from '@tanstack/match-sorter-utils'
+
+declare module '@tanstack/react-table' {
+  //add fuzzy filter to the filterFns
+  interface FilterFns {
+    fuzzy: FilterFn<unknown>
+  }
+  interface FilterMeta {
+    itemRank: RankingInfo
+  }
+}
+
+// Define a custom fuzzy filter function that will apply ranking info to rows (using match-sorter utils)
+const fuzzyFilter: FilterFn<any> = (row, columnId, value, addMeta) => {
+  // Rank the item
+  const itemRank = rankItem(row.getValue(columnId), value)
+
+  // Store the itemRank info
+  addMeta({
+    itemRank,
+  })
+
+  // Return if the item should be filtered in/out
+  return itemRank.passed
+}
 
 interface DataTableProps<TData, TValue> {
   children?: React.ReactNode
@@ -46,23 +76,30 @@ export function DataTable<TData, TValue>({
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(
     []
   )
+  const [globalFilter, setGlobalFilter] = useState('')
   const [pagination, setPagination] = useState({ pageIndex: 0, pageSize: 7 })
 
   const table = useReactTable({
     data,
     columns,
+    state: {
+      sorting,
+      columnFilters,
+      pagination,
+      globalFilter,
+    },
+    filterFns: {
+      fuzzy: fuzzyFilter, //define as a filter function that can be used in column definitions
+    },
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
+    onGlobalFilterChange: setGlobalFilter,
+    globalFilterFn: 'fuzzy', //apply fuzzy filter to the global filter (most common use case for fuzzy filter)
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onPaginationChange: setPagination,
-    state: {
-      sorting,
-      columnFilters,
-      pagination
-    },
   })
 
   const targetRowCount = pagination.pageSize;
@@ -85,14 +122,21 @@ export function DataTable<TData, TValue>({
           {children}
           <div className="relative flex items-center w-full">
             <Search className="absolute left-3 top-[19px] transform -translate-y-1/2 z-10" size={16}/>
-            <Input 
+            <Input
+              type="text"
+              value={globalFilter ?? ''}
+              onChange={e => setGlobalFilter(String(e.target.value))}
+              className='relative pl-11 min-w-28 border-t-0 border-l-0 border-r-0 border-b rounded-none'
+              placeholder="Buscar..."
+            />
+            {/* <Input 
               type="text" 
               placeholder={searchPlaceholder ? searchPlaceholder : "Buscar..."} 
               className='relative pl-11 min-w-28 border-t-0 border-l-0 border-r-0 border-b rounded-none'
               value={(table.getColumn(filterByColumn)?.getFilterValue() as string) ?? ""}
               onChange={(event) => table.getColumn(filterByColumn)?.setFilterValue(event.target.value)
             }
-            ></Input>
+            ></Input> */}
           </div>
         </div>
       </div>

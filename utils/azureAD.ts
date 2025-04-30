@@ -16,7 +16,8 @@ export async function getProfilePhoto(accessToken: string) {
 }
 
 export async function refreshAccessToken(token: any) {
-  if(token.provider === 'azure-ad') {
+  const shouldRefresh = Date.now() > token.accessTokenExpires - 60 * 10000; // 10 minutos antes de expirar
+  if(token.provider === 'azure-ad' && shouldRefresh) {
 
     try {
       const url =

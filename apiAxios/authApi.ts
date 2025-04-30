@@ -3,12 +3,12 @@ import Cookies from "js-cookie";
 import https from 'https';
 
 const baseURLs = {
-  development: 'https://localhost:7113/api',
-  test: 'https://localhost:7113/api',
+  development: 'https://localhost:7186/api',
+  test: 'https://localhost:7186/api',
   production: 'https://adminapi.grupotepsi.com/api',
 };
 
-const currentEnv = 'production';
+const currentEnv = 'development';
 export const baseURL = baseURLs[currentEnv];
 
 const moduloActual = "-";
@@ -24,9 +24,9 @@ export const authApi = (token?: string, ignoreToken = false) => {
     }
   });
 
-  // if (currentEnv === 'development') {
-  //   axiosInstance.defaults.httpsAgent = new https.Agent({ rejectUnauthorized: false });
-  // }
+  if (currentEnv === 'development') {
+    axiosInstance.defaults.httpsAgent = new https.Agent({ rejectUnauthorized: false });
+  }
 
   if(!ignoreToken){
     axiosInstance.interceptors.request.use(async (config) => {

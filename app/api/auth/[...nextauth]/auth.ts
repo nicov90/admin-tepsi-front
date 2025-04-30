@@ -83,8 +83,9 @@ export const authOptions: AuthOptions = {
     async jwt({ token, account, user, trigger }: any) { // Devuelve el token al navegador
       // console.log('JWT Callback - Admin:', { token, account, user });
       
-      if ( account ) {
+      if ( account && user ) {
         token.accessToken = account.access_token;
+        token.id_token = account.id_token;
         token.refreshToken = account.refresh_token;
         token.accessTokenExpires = Date.now() + account.expires_at! * 1000;
         token.provider = account.provider;
@@ -179,23 +180,21 @@ export const authOptions: AuthOptions = {
   },
 
   events: {
-    async signIn({ user, account, profile }) {
-      const userName = (user?.name || profile?.name)?.split(" ").map((word) => word.toUpperCase()).join(" ")!;
+    async signIn({ user, account, profile }: any) {
+      const userName = (user?.name || profile?.name)?.split(" ").map((word: string) => word.toUpperCase()).join(" ")!;
       const userEmail = user?.email || profile?.email;
       if(account?.provider === 'azure-ad' && userEmail){
         try{
-          const newToken = (await authApi(undefined, true).post(`/Auth/ValidarTokenAzure`, {
-            azureToken: account?.access_token,
-          })).data.token;
-
-          await registerUsuario({
-            email: userEmail,
-            nombre: userName,
-            roles: [],
-            tipoLogin: 'microsoft',
-            password: '',
-            cargadoPor: 'admin-tepsi',
-          }, newToken);
+          if(user.token){
+            await registerUsuario({
+              email: userEmail,
+              nombre: userName,
+              roles: [],
+              tipoLogin: 'microsoft',
+              password: '',
+              cargadoPor: 'admin-tepsi',
+            }, user?.token);  
+          }
         }catch(err){
           console.log(err)
         }
@@ -267,11 +266,10 @@ export const authOptions: AuthOptions = {
 
 const handleAzureAdToken = async (session: any) => {
   const tokenExpired = isTokenExpired(session.user?.token);
-
   if (!session.user.token || tokenExpired) {
     try {
-      const newToken = (await authApi().post(`/Auth/ValidarTokenAzure`, {
-        azureToken: session.accessToken,
+      const newToken = (await authApi(undefined, true).post(`/Auth/ValidarTokenAzure`, {
+        azureToken: session.id_token,
       })).data.token;
       session.user.token = newToken;
     } catch (error) {
