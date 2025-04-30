@@ -8,7 +8,7 @@ const baseURLs = {
   production: 'https://adminapi.grupotepsi.com/api',
 };
 
-const currentEnv = 'development';
+const currentEnv = process.env.NEXT_PUBLIC_ENV as keyof typeof baseURLs || 'production';
 export const baseURL = baseURLs[currentEnv];
 
 const moduloActual = "-";
