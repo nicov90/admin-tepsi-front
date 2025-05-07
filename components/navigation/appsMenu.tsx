@@ -1,10 +1,9 @@
 "use client"
-import React, { useEffect, useRef, useState } from 'react'
-import { ClipboardList, GripIcon, ShirtIcon, UserRoundCog, Wallet } from 'lucide-react'
-import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
-import { useSession } from 'next-auth/react'
 import { SessionWithUser } from '@/interfaces/session'
+import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
+import { ClipboardList, GripIcon, ShirtIcon, UserRoundCog, Wallet } from 'lucide-react'
+import { useSession } from 'next-auth/react'
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
 
 const apps = [
   {

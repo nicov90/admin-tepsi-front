@@ -1,15 +1,13 @@
 'use client'
-import dayjs from "dayjs";
+import { ColumnDef } from "@tanstack/react-table";
 import "dayjs/locale/es";
-import { ColumnDef } from "@tanstack/react-table"
 
-import { ArrowUpDown, ChevronDown, ChevronUp, TriangleAlert } from "lucide-react"
+import { ArrowUpDown, ChevronDown, ChevronUp, TriangleAlert } from "lucide-react";
  
-import { Button } from "@/components/ui/button"
-import { Checkbox } from "@/components/ui/checkbox"
+import { Button } from "@/components/ui/button";
 import { IUsuario } from "@/interfaces/usuarios";
-import TableItemDropdown from "./tableItemDropdown";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "../ui/tooltip";
+import TableItemDropdown from "./tableItemDropdown";
 
 const getChevronIcon = (column: any) => {
   if (column.getIsSorted() === "asc") {

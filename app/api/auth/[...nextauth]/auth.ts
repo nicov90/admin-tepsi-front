@@ -1,14 +1,13 @@
-import { AuthOptions } from "next-auth";
-import Credentials from 'next-auth/providers/credentials';
-import bcrypt from 'bcrypt';
-import AzureAD, { AzureADProfile } from 'next-auth/providers/azure-ad';
-import { capitalize } from 'lodash';
-import { IUsuario } from '@/interfaces/usuarios';
-import { getUsuarioByEmail, registerUsuario } from '@/database/dbUsuarios';
 import { authApi } from "@/apiAxios/authApi";
+import { getUsuarioByEmail, registerUsuario } from '@/database/dbUsuarios';
+import { IUsuario } from '@/interfaces/usuarios';
+import { refreshAccessToken } from "@/utils/azureAD";
+import bcrypt from 'bcrypt';
 import dayjs from "dayjs";
 import { jwtDecode } from 'jwt-decode';
-import { refreshAccessToken } from "@/utils/azureAD";
+import { AuthOptions } from "next-auth";
+import AzureAD, { AzureADProfile } from 'next-auth/providers/azure-ad';
+import Credentials from 'next-auth/providers/credentials';
 
 export const authOptions: AuthOptions = {
   providers: [

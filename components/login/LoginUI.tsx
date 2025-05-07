@@ -1,22 +1,19 @@
 'use client'
 
-import React, { useEffect } from 'react'
-import { useState } from "react";
 import { signIn, useSession } from "next-auth/react";
+import { useState } from "react";
 
-import { useForm } from "react-hook-form";
-import { validations } from "@/utils";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { redirect, usePathname, useRouter, useSearchParams } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 import { SessionWithUser } from '@/interfaces/session';
-import Image from 'next/image';
-import tepsiLogo from "@/public/tepsi-logo.webp";
 import Microsoft from '@/public/microsoft-icon.svg';
-import { toast } from 'sonner';
+import { validations } from "@/utils";
+import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useForm } from "react-hook-form";
 import { BeatLoader } from 'react-spinners';
+import { toast } from 'sonner';
 
 type FormData = {
   email: string;

@@ -1,12 +1,12 @@
 "use client";
 
 import { useWindowSize } from "@/hooks/useWindowSize";
+import { SessionWithUser } from "@/interfaces/session";
 import { cn } from "@/lib/utils";
+import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useParams, usePathname } from "next/navigation";
 import getRoutes from "../utils/navigation/routes";
-import { SessionWithUser } from "@/interfaces/session";
-import { useSession } from "next-auth/react";
 
 export function MainNav({
     className,
