@@ -1,36 +1,38 @@
 "use client"
-import { SessionWithUser } from '@/interfaces/session'
-import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react'
-import { ClipboardList, GripIcon, ShirtIcon, UserRoundCog, Wallet } from 'lucide-react'
-import { useSession } from 'next-auth/react'
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip'
+import { authApi } from '@/apiAxios/authApi';
+import { SessionWithUser } from '@/interfaces/session';
+import { Menu, MenuButton, MenuItem, MenuItems, Transition } from '@headlessui/react';
+import clsx from 'clsx';
+import * as Icons from "lucide-react";
+import { LucideProps } from "lucide-react";
+import { useSession } from 'next-auth/react';
+import Image from 'next/image';
+import useSwr from 'swr';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '../ui/tooltip';
 
-const apps = [
-  {
-    name: "Rendiciones",
-    link: "https://rendiciones.grupotepsi.com",
-    description: "Sistema de rendiciones",
-    imageComponent: () => <Wallet className="w-6 h-6" />
-  },
-  {
-    name: "Novedades",
-    link: "https://partenovedades.grupotepsi.com",
-    description: "Sistema de parte de novedades",
-    imageComponent: () => <ClipboardList className="w-6 h-6" />
-  },
-  {
-    name: "EPP",
-    link: "https://epp.grupotepsi.com",
-    description: "Sistema de elementos de protección personal",
-    imageComponent: () => <ShirtIcon className="w-6 h-6" />
-  },
-  {
-    name: "Usuarios",
-    link: "https://admin.grupotepsi.com",
-    description: "Sistema de administración de usuarios y roles",
-    imageComponent: () => <UserRoundCog className="w-6 h-6" />
-  },
-]
+interface IApp {
+  Name: string;
+  Link: string;
+  Description: string;
+  IconName: string;
+  ImageUrl: string | null;
+  AlwaysVisible: boolean | null;
+}
+
+const getLucideIcon = (IconName: string): React.FC<LucideProps> => {
+  if (!Icons[IconName as keyof typeof Icons]) {
+    console.log(`Icono "${IconName}" no encontrado en lucide-react`);
+    return Icons.HelpCircle; // Fallback to a default icon if not found
+  }
+  return Icons[IconName as keyof typeof Icons] as React.FC<LucideProps>;
+};
+
+const GripIcon = getLucideIcon('Grip');
+
+const fetcher = async (url: string) => {
+  const response = await authApi().get(url);
+  return response.data.response;
+}
 
 type Props = {
   className?: string
@@ -38,10 +40,16 @@ type Props = {
 }
 const AppsMenu = ({ className, position = 'left' }: Props) => {
   const { data: session } = useSession() as SessionWithUser;
+  const currentHost = typeof window !== "undefined" ? window.location.hostname : "";
+
+  const { data: apps = [] } = useSwr<IApp[]>('/apps', fetcher);
 
    // código para filtrar las apps a mostrar si el usuario no tiene ningun rol de esa app.
-   const userHasRoleForApp = (appName: string) => {
+  const userHasRoleForApp = (app: IApp) => {
+    if(app.AlwaysVisible === true) return true; // ignora roles
+
     if (!session?.user?.roles) return false;
+    const appName = app.Name;
 
     if(appName === 'Usuarios'){
       return session.user.roles.some(role => {
@@ -55,11 +63,20 @@ const AppsMenu = ({ className, position = 'left' }: Props) => {
       return roleAppName == appName.toUpperCase();
     });
   };
-  const filteredApps = apps.filter(app => userHasRoleForApp(app.name));
 
-  const numApps = filteredApps.length;
-  const nroColumns = 3;
-  const numSiluetas = numApps < nroColumns ? nroColumns - numApps : (numApps % nroColumns === 0 ? 0 : nroColumns - (numApps % nroColumns));
+  const sortAppsByCurrentHost = (a: IApp, b: IApp) => {
+    const aIsCurrent = new URL(a.Link).hostname === currentHost;
+    const bIsCurrent = new URL(b.Link).hostname === currentHost;
+
+    // Si a es actual y b no, a va primero (-1)
+    if (aIsCurrent && !bIsCurrent) return -1;
+    if (!aIsCurrent && bIsCurrent) return 1;
+
+    // Si ninguno o ambos son actuales, mantener orden alfabético
+    return a.Name.localeCompare(b.Name);
+  };
+
+  const filteredApps = apps.filter(userHasRoleForApp).sort(sortAppsByCurrentHost);
   
   return (
     <Menu as="div" className="relative inline-block text-left z-50">
@@ -86,45 +103,73 @@ const AppsMenu = ({ className, position = 'left' }: Props) => {
             ring-black ring-opacity-5 focus:outline-none`}
               static
             >
-              <div className="grid grid-cols-3">
-                {filteredApps.map((app) => (
-                  <MenuItem key={app.name}>
-                    {({ focus }) => (
-                      <div className='relative flex flex-col items-center w-full'>
-                        <TooltipProvider>
-                          <Tooltip delayDuration={800}>
-                            <TooltipTrigger className='w-full'>
-                              <a
-                                href={app.link}
-                                className={`${
-                                  focus ? 'bg-gray-100' : ''
-                                } flex flex-col items-center justify-center py-2 text-sm text-gray-700 gap-1.5 text-center border border-transparent rounded-xl`}
-                              >
-                                <div className='flex flex-col items-center justify-start py-2 text-sm text-gray-700 gap-1.5 text-center'>
-                                  <div className="flex-shrink-0">{<app.imageComponent />}</div>
-                                  <div>{app.name}</div>
-                                </div>
-                              </a>
-                            </TooltipTrigger>
-                            <TooltipContent 
-                                side='bottom'
-                                className="w-40 bg-gray-800 text-white p-2 rounded-md shadow-lg text-xs text-pretty text-center"
-                              >
-                              <p>{app.description}</p>
-                            </TooltipContent>
-                          </Tooltip>
-                        </TooltipProvider>
-                      </div>
-                    )}
-                  </MenuItem>
-                ))}
-                {/* Renderiza las siluetas para llenar los espacios vacíos */}
-                {Array.from({ length: numSiluetas }).map((_, index) => (
-                  <MenuItem key={`silhouette-${index}`}>
-                    <></>{/* <Silueta /> */}
-                  </MenuItem>
-                ))}
-              </div>
+              {filteredApps.length === 0 ? (
+                <div className='flex items-center justify-center w-full h-16 text-xs text-gray-500'>
+                  <p className='text-center'>No tienes acceso a ninguna aplicación</p>
+                </div>
+              ) : (
+                <div className="grid grid-cols-3 gap-1">
+                  {filteredApps.map((app) => {
+                    const isCurrent = new URL(app.Link).hostname === currentHost;
+                    const LucideIcon = getLucideIcon(app.IconName);
+                    
+                    return (
+                      <MenuItem key={app.Name}>
+                        {({ focus }) => (
+                          <div className='relative flex flex-col items-center w-full'>
+                            <TooltipProvider>
+                              <Tooltip delayDuration={800}>
+                                <TooltipTrigger className='w-full'>
+                                  <a
+                                    href={isCurrent ? '#' : app.Link}
+                                    className={clsx(
+                                      'flex flex-col items-center justify-center py-2 text-sm text-center border rounded-xl gap-1.5',
+                                      isCurrent
+                                        ? 'bg-stone-100 text-black font-bold cursor-default '
+                                        : focus
+                                        ? 'bg-stone-100 text-gray-700 border-transparent'
+                                        : 'text-gray-700 border-transparent hover:bg-stone-50'
+                                    )}
+                                    // className={`${
+                                    //   focus ? 'bg-gray-100' : ''
+                                    // } flex flex-col items-center justify-center py-2 text-sm text-gray-700 gap-1.5 text-center border border-transparent rounded-xl`}
+                                  >
+                                    <div className='flex flex-col items-center justify-start py-2 text-sm text-gray-700 gap-1.5 text-center'>
+                                      {app.ImageUrl ? (
+                                        <Image
+                                          src={app.ImageUrl}
+                                          alt={app.Name}
+                                          unoptimized
+                                          width={24}
+                                          height={24}
+                                          priority
+                                          onError={(e) => {
+                                            (e.target as HTMLImageElement).style.display = 'none';
+                                          }}
+                                        />
+                                      ) : (
+                                        <div className="flex-shrink-0">
+                                          { <LucideIcon className="w-6 h-6" /> }
+                                        </div>
+                                      )}
+                                      <div>{app.Name}</div>
+                                    </div>
+                                  </a>
+                                </TooltipTrigger>
+                                <TooltipContent 
+                                    side='bottom'
+                                    className="w-40 bg-gray-800 text-white p-2 rounded-md shadow-lg text-xs text-pretty text-center"
+                                  >
+                                  <p>{app.Description}</p>
+                                </TooltipContent>
+                              </Tooltip>
+                            </TooltipProvider>
+                          </div>
+                        )}
+                      </MenuItem>
+                  )})}
+                </div>
+              )}
             </MenuItems>
           </Transition>
         </>
@@ -132,15 +177,5 @@ const AppsMenu = ({ className, position = 'left' }: Props) => {
     </Menu>
   )
 }
-
-// Componente de silueta
-const Silueta = () => (
-  <div className="flex flex-col items-center justify-center py-2 text-sm text-gray-300 rounded-xl">
-    <div className="flex flex-col items-center justify-center py-2 w-full">
-      <div className="w-6 h-6 opacity-90 bg-gray-50 rounded-full"></div>
-      <div className="mt-2 w-8 h-3 bg-gray-50 rounded-sm"></div>
-    </div>
-  </div>
-);
 
 export default AppsMenu
