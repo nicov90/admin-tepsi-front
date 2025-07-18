@@ -84,14 +84,13 @@ export const authOptions: AuthOptions = {
       
       if ( account && user ) {
         token.accessToken = account.access_token;
-        token.id_token = account.id_token;
         token.refreshToken = account.refresh_token;
         token.accessTokenExpires = Date.now() + account.expires_at! * 1000;
         token.provider = account.provider;
         token.user = user;
         
         if (token.provider === "azure-ad") {
-          await handleAzureAdToken(token);
+          await handleAzureAdToken(token, account.id_token);
         }
       }
       
@@ -263,12 +262,12 @@ export const authOptions: AuthOptions = {
   }
 }
 
-const handleAzureAdToken = async (session: any) => {
+const handleAzureAdToken = async (session: any, idTokenAzure: string) => {
   const tokenExpired = isTokenExpired(session.user?.token);
   if (!session.user.token || tokenExpired) {
     try {
       const newToken = (await authApi(undefined, true).post(`/Auth/ValidarTokenAzure`, {
-        azureToken: session.id_token,
+        azureToken: idTokenAzure,
       })).data.token;
       session.user.token = newToken;
     } catch (error) {
