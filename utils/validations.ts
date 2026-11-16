@@ -22,11 +22,19 @@ export const userSchema = Yup.object({
   roles: Yup.array().min(1, "Requerido").required("Requerido"),
 })
 
+// Un email nunca lleva espacios: se quitan todos (también los invisibles que vienen al copiar y pegar,
+// como el espacio duro o el de ancho cero). Con uno solo adelante, el usuario queda guardado con un
+// email que no coincide con el de su sesión y los módulos le niegan el acceso.
+export const limpiarEmail = (email: string | null | undefined): string =>
+  (email ?? '').replace(/[\s​-‍⁠]/g, '');
+
 export const NuevaCuentaFormSchema = z.object({
   nombre: z.string().min(3, { message: 'El nombre es requerido' }),
-  email: z.string().email({ message: 'Ingrese un email válido' }).refine(email => email.endsWith('@tepsi.com.ar'), {
-    message: 'El email debe ser de dominio tepsi.com.ar'
-  }),
+  email: z.string().transform(limpiarEmail).pipe(
+    z.string().email({ message: 'Ingrese un email válido' }).refine(email => email.endsWith('@tepsi.com.ar'), {
+      message: 'El email debe ser de dominio tepsi.com.ar'
+    })
+  ),
   password: z.string().optional(),
   roles: z.array(z.string()).min(1, { message: 'Debe seleccionar al menos un rol' }),
   mostrarInputPassword: z.boolean(), // Añadir este campo al esquema

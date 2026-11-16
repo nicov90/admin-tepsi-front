@@ -5,7 +5,7 @@ import { IPersonal } from '@/interfaces/personal'
 import { SessionWithUser } from '@/interfaces/session'
 import { IUsuarioNuevo } from '@/interfaces/usuarios'
 import { UsuariosRolesContext } from '@/providers/usuariosRoles-provider'
-import { NuevaCuentaFormSchema, NuevaCuentaFormSchemaRefined } from '@/utils/validations'
+import { limpiarEmail, NuevaCuentaFormSchema, NuevaCuentaFormSchemaRefined } from '@/utils/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { startCase } from 'lodash'
 import { CircleHelpIcon, PlusSquareIcon } from 'lucide-react'
@@ -70,7 +70,7 @@ const CargarUsuario = () => {
     const formattedValues: IUsuarioNuevo = {
       ...values,
       nombre: startCase(values.nombre.trim()),
-      email: values.email.trim(),
+      email: limpiarEmail(values.email),
       password: values.password?.trim() || '',
       roles: values.roles,
       cargadoPor: session.user?.id || '',
@@ -113,9 +113,10 @@ const CargarUsuario = () => {
                           onChange={(e) => {
                             clearErrors('email');
                             form.resetField('nombre');
-                            field.onChange(e);
-                            if (NuevaCuentaFormSchema.shape.email.safeParse(e.target.value).success) {
-                              checkEmailExists(e.target.value);
+                            const email = limpiarEmail(e.target.value);
+                            field.onChange(email);
+                            if (NuevaCuentaFormSchema.shape.email.safeParse(email).success) {
+                              checkEmailExists(email);
                             }
                           }}
                         />

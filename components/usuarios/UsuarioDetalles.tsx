@@ -7,7 +7,7 @@ import { Rol } from '@/interfaces/roles'
 import { SessionWithUser } from '@/interfaces/session'
 import { IUsuarioUpdate } from '@/interfaces/usuarios'
 import { UsuariosRolesContext } from '@/providers/usuariosRoles-provider'
-import { NuevaCuentaFormSchema, NuevaCuentaFormSchemaRefined } from '@/utils/validations'
+import { limpiarEmail, NuevaCuentaFormSchema, NuevaCuentaFormSchemaRefined } from '@/utils/validations'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { startCase } from 'lodash'
 import { CircleHelpIcon, PlusSquareIcon } from 'lucide-react'
@@ -50,7 +50,7 @@ const UsuarioDetalles = () => {
     const formattedValues: IUsuarioUpdate = {
       ...values,
       nombre: startCase(values.nombre.trim()),
-      email: values.email.trim(),
+      email: limpiarEmail(values.email),
       password: values.password === templatePassword ? null : values.password?.trim() || null,
       roles: values.roles
     }
@@ -83,7 +83,9 @@ const UsuarioDetalles = () => {
       (async () => {
         form.reset({
           nombre: usuario?.nombre,
-          email: usuario?.email,
+          // Un usuario ya guardado con espacios en el email se corrige con sólo abrirlo y guardar
+          // (la búsqueda del registro sigue usando el email original, usuario.email).
+          email: limpiarEmail(usuario?.email),
           roles: [],
           password: usuario?.password ? templatePassword : '',
           mostrarInputPassword: usuario?.password ? true : false,
@@ -122,9 +124,10 @@ const UsuarioDetalles = () => {
                         onChange={(e) => {
                           clearErrors('email');
                           form.resetField('nombre');
-                          field.onChange(e);
-                          if (NuevaCuentaFormSchema.shape.email.safeParse(e.target.value).success) {
-                            setearNombre(e.target.value);
+                          const email = limpiarEmail(e.target.value);
+                          field.onChange(email);
+                          if (NuevaCuentaFormSchema.shape.email.safeParse(email).success) {
+                            setearNombre(email);
                           }
                         }}
                       />
